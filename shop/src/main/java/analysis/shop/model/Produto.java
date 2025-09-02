@@ -8,7 +8,7 @@ public class Produto {
     private String categoria;       
     private double preco;          
     private String sku;            
-    private int quantidadeEmEstoque; 
+    private int quantidadeEmEstoque;
     
 
     private String marca;          

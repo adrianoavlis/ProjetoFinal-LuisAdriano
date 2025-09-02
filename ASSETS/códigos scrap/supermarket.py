@@ -51,9 +51,9 @@ for anuncio in anuncios:
 dataset = pd.DataFrame(cards)
 
 # Salvando como CSV no caminho especificado
-dataset.to_csv(r'C:\Users\PC\Projetos\Projeto-Final---Luis-Adriano-\ASSETS\data\WebData\supermarket\datasetSupermarket.csv', sep=';', index=False, encoding='utf-8-sig')
+# dataset.to_csv(r'C:\Users\PC\Projetos\Projeto-Final---Luis-Adriano-\ASSETS\data\WebData\supermarket\datasetSupermarket.csv', sep=';', index=False, encoding='utf-8-sig')
 
 # Salvando como XLS no caminho especificado
-dataset.to_excel(r'C:\Users\PC\Projetos\Projeto-Final---Luis-Adriano-\ASSETS\data\WebData\supermarket\datasetSupermarket.xlsx', index=False)
+# dataset.to_excel(r'C:\Users\PC\Projetos\Projeto-Final---Luis-Adriano-\ASSETS\data\WebData\supermarket\datasetSupermarket.xlsx', index=False)
 
 print(dataset)

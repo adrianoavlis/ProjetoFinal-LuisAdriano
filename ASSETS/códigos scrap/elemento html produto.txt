@@ -1,0 +1,33 @@
+<div class="col item">
+
+				<div class="row">
+					<div class="col image" style="background-image: url('//www.supermercadosguanabara.com.br:443/sites/default/files/sistema/encarte/produtos/azeite_gallo_tipo_unico_portugal_250ml_260724_copy.png');">
+						<div class="price"><div class="vertical-align"><span class="number">24,98</span> </div></div>
+					</div>
+					<div class="col text">
+						<div class="vertical-align">
+							<div class="name">Azeite Extra Oliva Único Gallo 250ml</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+/html/body/section/div[4]/div/div[3]/div/div/div produto    
+/html/body/section/div[4]/div/div[3]/div/div/div/div/div[2]/div/div nome
+
+
+<div class="col item">
+
+				<div class="row">
+					<div class="col image" style="background-image: url('//www.supermercadosguanabara.com.br:443/sites/default/files/sistema/encarte/produtos/produto-arcor-tablete-chololate-leite.png');">
+						<div class="price"><div class="vertical-align"><span class="number">5,75</span> </div></div>
+					</div>
+					<div class="col text">
+						<div class="vertical-align">
+							<div class="name">Chocolate Arcor 80g</div>
+						</div>
+					</div>
+				</div>
+			</div>
