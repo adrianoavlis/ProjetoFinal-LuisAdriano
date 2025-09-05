@@ -1,0 +1,23 @@
+
+
+Evolução dos preços: 
+Você pode criar uma série histórica com os dados dos últimos meses ou anos, identificando tendências e sazonalidades. 
+Por exemplo, comparar o aumento dos preços em diferentes períodos do ano e ver se há algum padrão.
+
+Comparação regional: 
+Você pode comparar o custo da cesta básica em diferentes cidades, considerando o custo de vida, 
+o nível de renda da população e outros fatores regionais, como clima ou acesso a determinados produtos.
+
+Impacto da inflação: 
+Cruzar os dados da cesta básica com os índices de inflação, como o IPCA, 
+para ver se o aumento da cesta acompanha a inflação geral ou se há variações específicas.
+
+Peso dos itens: 
+Identificar quais produtos têm maior representatividade no custo total e como isso afeta diferentes perfis de consumidores, 
+como famílias de baixa renda, por exemplo.
+
+Influência de eventos externos: 
+Analisar como crises econômicas, variações cambiais ou problemas climáticos, como secas ou geadas, impactaram os preços.
+
+Scrapping de informações de produtos externos: 
+Coletar dados como: nome, categoria, descrição e preço de itens essenciais da cesta básica para avaliar o Peso dos Itens no custo total da cesta básica.
