@@ -1,0 +1,25 @@
+src/main/java/br/uff/cestabasica/
+  domain/
+    model/
+      common/
+        BaseEntity.java
+        UnidadeMedida.java
+        PerfilUsuario.java
+        FontePreco.java
+      geo/
+        Pais.java
+        Estado.java
+        Municipio.java
+        Localizacao.java
+      mercado/
+        Supermercado.java
+        CategoriaProduto.java
+        Produto.java
+        ProdutoLoja.java
+        PrecoHistorico.java
+        TagPublico.java
+      usuario/
+        Usuario.java
+        Lojista.java
+      feedback/
+        AvaliacaoProduto.java

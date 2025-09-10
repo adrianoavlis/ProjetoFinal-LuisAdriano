@@ -46,9 +46,8 @@ CREATE TABLE Usuario (
     id_usuario       INT IDENTITY(1,1) PRIMARY KEY,
     nome             NVARCHAR(120)       NOT NULL,
     email            NVARCHAR(255)       NOT NULL,
-    -- Em produção, armazene HASH + SALT, não a senha em texto
-    senha_hash       VARBINARY(256)      NULL,  -- substitui "senha" do modelo
-    localizacao      NVARCHAR(255)       NULL,
+    senha_hash       VARBINARY(256)      NULL,  -- substitui "senha" do modelo. Em produção, armazene HASH + SALT, não a senha em texto
+    localizacao      INT			     NULL,
     dt_criacao       DATETIME2(0)        NOT NULL CONSTRAINT DF_Usuario_dt_criacao DEFAULT (SYSUTCDATETIME())
 );
 -- e-mail deve ser único
