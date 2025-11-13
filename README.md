@@ -41,7 +41,7 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 
 ![Evolução de Preços](ASSETS/docs/prototipos/Evolução.png)
 
-![Evolução de Preços](ASSETS/docs/prototipos/Grafico Evolução.png)
+![Evolução de Preços](ASSETS/docs/prototipos/Grafico_Evolucao.png)
 
 ![Comparativo Regional](ASSETS/docs/prototipos/Comparativo_Regional_.png)
 
