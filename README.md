@@ -12,7 +12,7 @@ A Plataforma de Análise da Cesta Básica oferece um painel interativo para:
 - Identificar **padrões de variação, sazonalidade e assimetrias regionais**.
 - Relacionar o custo da cesta com **inflação e eventos externos**.
 
-As visualizações e indicadores são fundamentados em dados do DIEESE e do IBGE (IPCA/INPC), além de análises produzidas no contexto do artigo científico do TCC.
+As visualizações e indicadores são fundamentados em dados do DIEESE, além de análises produzidas no contexto do artigo científico do TCC.
 
 ## 📚 Eixos Analíticos da Pesquisa
 
@@ -35,6 +35,22 @@ As visualizações e indicadores são fundamentados em dados do DIEESE e do IBGE
 - **Front-end:** JSP, HTML5, CSS3, JavaScript, Bootstrap 5  
 - **Banco de Dados:** Microsoft SQL Server  
 - **Versionamento:** Git e GitHub
+
+
+##  Painel Analítico da Cesta Básica
+
+![Evolução de Preços](./images/dashboard.png)
+
+![Evolução de Preços](./images/dashboard.png)
+
+![Comparativo Regional](./images/dashboard.png)
+
+![Comparativo Regional](./images/dashboard.png)
+
+![Peso dos Itens](./images/dashboard.png)
+
+![Influencia Eventos Externos](./images/dashboard.png)
+
 
 ## 🗂️ Estrutura do Repositório
 
