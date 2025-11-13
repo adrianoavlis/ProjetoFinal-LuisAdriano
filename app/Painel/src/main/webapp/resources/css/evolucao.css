@@ -1,0 +1,320 @@
+:root {
+  --color-surface: #f4f6fb;
+  --color-border: #d9e0f3;
+  --color-primary: #2563eb;
+  --color-primary-soft: rgba(37, 99, 235, 0.12);
+  --color-variation: #22c55e;
+  --color-variation-soft: rgba(34, 197, 94, 0.12);
+  --color-variation-anual: #9333ea;
+  --color-variation-anual-soft: rgba(147, 51, 234, 0.12);
+  --color-trend: #f97316;
+  --color-trend-soft: rgba(249, 115, 22, 0.12);
+  --color-muted: #64748b;
+  --radius-lg: 1rem;
+}
+
+body.bg-surface {
+  background: var(--color-surface);
+  min-height: 100vh;
+}
+
+.sticky-card {
+  position: sticky;
+  top: 1.5rem;
+  border: none;
+  border-radius: var(--radius-lg);
+}
+
+.sticky-card .card-body {
+  padding: 1.75rem 1.5rem;
+}
+
+.icon-circle {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.icon-circle--accent {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(79, 70, 229, 0.18));
+  color: #1d4ed8;
+}
+
+.material-symbols-outlined {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip-container .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.08);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.chip-container .chip button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.kpi-card {
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.4rem;
+  color: #0f172a;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.kpi-card__label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  margin-bottom: 0.3rem;
+}
+
+.kpi-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.kpi-card__meta {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+.kpi-card--price {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(59, 130, 246, 0.35));
+}
+
+.kpi-card--price::after {
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.45), transparent 60%);
+}
+
+.kpi-card--variation {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(22, 163, 74, 0.35));
+}
+
+.kpi-card--variation::after {
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.35), transparent 55%);
+}
+
+.kpi-card--trend {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(251, 146, 60, 0.4));
+}
+
+.kpi-card--trend::after {
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.35), transparent 55%);
+}
+
+.legend-box {
+  background: rgba(15, 23, 42, 0.03);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.legend-swatch--price {
+  background: var(--color-primary);
+}
+
+.legend-swatch--variation {
+  background: var(--color-variation);
+}
+
+.legend-swatch--variation-anual {
+  background: var(--color-variation-anual);
+}
+
+.variation-toggle {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.variation-toggle .btn {
+  border-radius: 0.75rem !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.variation-toggle .btn-check:checked + .btn {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.25);
+}
+
+.variation-toggle .btn:focus {
+  box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.25);
+}
+
+.map-panel {
+  height: 420px;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.map-panel .leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.map-panel .leaflet-control-container .leaflet-control-zoom {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -18px rgba(15, 23, 42, 0.6);
+}
+
+.map-panel .leaflet-control-container .leaflet-control-zoom a {
+  color: #0f172a;
+}
+
+.mapa-tooltip {
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  box-shadow: 0 18px 36px -24px rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.mapa-tooltip strong {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.mapa-tooltip small {
+  color: rgba(226, 232, 240, 0.8);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.mapa-tooltip ul {
+  padding-left: 1rem;
+  margin: 0;
+}
+
+.mapa-tooltip ul li {
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.map-side {
+  border-radius: var(--radius-lg);
+  background: white;
+  border: 1px solid var(--color-border);
+}
+
+.info-grid dt {
+  margin-bottom: 0.25rem;
+}
+
+.info-grid dd {
+  margin-bottom: 0.25rem;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.5rem 0.75rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 420px;
+}
+
+.chart-wrapper > div {
+  width: 100%;
+  height: 100%;
+}
+
+.badge.text-bg-light {
+  background: rgba(148, 163, 184, 0.18) !important;
+  color: #334155;
+}
+
+.badge.text-bg-secondary {
+  background: rgba(100, 116, 139, 0.22) !important;
+  color: #1e293b;
+}
+
+.badge.text-bg-success {
+  background: rgba(22, 163, 74, 0.18) !important;
+  color: #166534;
+}
+
+.badge.text-bg-danger {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #b91c1c;
+}
+
+.badge.text-bg-warning {
+  background: rgba(234, 179, 8, 0.18) !important;
+  color: #b45309;
+}
+
+@media (max-width: 991.98px) {
+  .sticky-card {
+    position: static;
+  }
+
+  .map-panel {
+    height: 360px;
+  }
+
+  .chart-wrapper {
+    height: 360px;
+  }
+}

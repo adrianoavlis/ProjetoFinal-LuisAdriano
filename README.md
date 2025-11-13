@@ -1,64 +1,88 @@
-# 📊 Plataforma para Análise da Cesta Básica  
+# Plataforma de Análise da Cesta Básica
 
-## 📝 Introdução  
-Este repositório contém os recursos, códigos e documentação relacionados ao meu **Trabalho de Conclusão de Curso (TCC)** no curso de **Sistemas de Informação – UFF**.  
+Aplicação web desenvolvida como parte do Trabalho de Conclusão de Curso em Sistemas de Informação da Universidade Federal Fluminense (UFF), Instituto de Computação (IC).  
+A plataforma investiga o custo da cesta básica no Brasil, combinando dados oficiais e ferramentas analíticas para apoiar pesquisas acadêmicas e decisões em políticas públicas.
 
-O projeto tem como objetivo desenvolver uma **plataforma de análise socioeconômica** que utilize os dados oficiais da **Pesquisa Nacional da Cesta Básica de Alimentos (DIEESE)** para investigar:  
-- A **evolução dos preços** ao longo do tempo;  
-- A **comparação regional** do custo da cesta em diferentes capitais;  
-- O **impacto da inflação** sobre os alimentos essenciais;  
-- O **peso relativo dos itens** no custo total da cesta;  
-- A influência de **eventos externos** (crises econômicas, crises políticas e crises climaticas) sobre os preços.  
+## 🎯 Objetivo da Aplicação e Base Científica
 
-Assim, a proposta é transformar a cesta básica em um **indicador acessível e visual**, contribuindo para a compreensão das condições de vida da população brasileira.  
+A Plataforma de Análise da Cesta Básica oferece um painel interativo para:
 
----
+- Explorar a **evolução de preços** dos itens essenciais.
+- **Comparar municípios** e capitais brasileiras.
+- Identificar **padrões de variação, sazonalidade e assimetrias regionais**.
+- Relacionar o custo da cesta com **inflação e eventos externos**.
 
-## 🔑 Funcionalidades  
+As visualizações e indicadores são fundamentados em dados do DIEESE e do IBGE (IPCA/INPC), além de análises produzidas no contexto do artigo científico do TCC.
 
-- **📈 Série Histórica de Preços**  
-  Exibição da evolução da cesta básica em diferentes períodos, identificando tendências e sazonalidades.  
+## 📚 Eixos Analíticos da Pesquisa
 
-- **🌎 Comparação Regional**  
-  Análise do custo da cesta em diferentes capitais, comparando o custo da cesta em relação ao custo de vida.  
+- **Evolução dos preços**
+- **Comparação regional**
+- **Impacto da inflação**
+- **Peso dos itens**
+- **Influência de eventos externos**
 
-- **💰 Impacto da Inflação**  
-  Cruzamento dos dados de custo da cesta básica com indicadores oficiais como IPCA e INPC.  
+## 📊 Funcionalidades Principais
 
-- **🥖 Composição da Cesta**  
-  Identificação dos produtos de maior representatividade no custo total da cesta.  
+1. **Evolução dos preços**
+2. **Comparação regional**
+3. **Peso dos itens**
+4. **Influência de eventos externos**
 
-- **🌦️ Análise de Eventos Externos**  
-  Estudo de como crises econômicas, crises climáticas e crises políticas que afetam os preços da cesta no país.  
+## 💻 Arquitetura e Tecnologias Utilizadas
 
-- **📊 Dashboard Analítico**  
-  Interface interativa com gráficos dinâmicos e relatórios estatísticos.  
+- **Back-end:** Spring Boot 3.5.5, Java 21  
+- **Front-end:** JSP, HTML5, CSS3, JavaScript, Bootstrap 5  
+- **Banco de Dados:** Microsoft SQL Server  
+- **Versionamento:** Git e GitHub
 
----
+## 🗂️ Estrutura do Repositório
 
-## 🛠️ Tecnologias  
+```text
+ProjetoFinal-LuisAdriano/
+├── pom.xml
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   ├── resources/
+│   │   └── webapp/
+│   └── test/
+└── README.md
+```
 
-- **Backend:** Java 21 + Spring Boot 3.5.5  
-- **Banco de Dados:** MSSQL SERVER 
-- **Frontend:** JSP, HTML, CSS e JS  
-- **Data Science:** KNIME (para limpeza, transformação e análise dos dados)  
-- **Gerenciamento:** Maven  
-- **Outros:** Selenium (para scraping de dados quando aplicável)  
+## ⚙️ Instalação e Execução Local
 
----
+1. **Clonar o repositório**
 
-## ⚙️ Instalação e Execução  
+```bash
+git clone https://github.com/adrianoavlis/ProjetoFinal-LuisAdriano.git
+cd ProjetoFinal-LuisAdriano
+```
 
-### 📋 Pré-requisitos  
-- JDK 21 instalado  
-- MSSQL SERVER configurado  
-- Maven 3.9+ instalado  
-- IDE (Eclipse/IntelliJ) com suporte a Spring Boot 3.5.5  
+2. **Configurar o banco de dados SQL Server**
 
----
+3. **Instalar dependências**
 
-## 👨‍🎓 Aluno  
-**Luis Adriano da Silva**  
+```bash
+mvn clean install
+```
 
-## 👨‍🏫 Professor Orientador  
-**João Felipe Nicolaci Pimentel**  
+4. **Executar a aplicação**
+
+```bash
+mvn spring-boot:run
+```
+
+5. **Acessar o painel**
+
+Acesse:  
+http://localhost:8081
+
+## 👤 Autores e Créditos
+
+- **Luis Adriano da Silva** – Desenvolvedor e autor do TCC  
+- **Prof. João Felipe Pimentel** – Orientador, IC/UFF
+
+## 📄 Licença
+
+Este projeto está licenciado sob a MIT License.
