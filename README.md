@@ -39,17 +39,17 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 
 ##  Painel Analítico da Cesta Básica
 
-![Evolução de Preços](.ASSETS/docs/prototipos/Evolução.png)
+![Evolução de Preços](ASSETS/docs/prototipos/Evolução.png)
 
-![Evolução de Preços](.ASSETS/docs/prototipos/Grafico_Evolução.png)
+![Evolução de Preços](ASSETS/docs/prototipos/Grafico_Evolução.png)
 
-![Comparativo Regional](.ASSETS/docs/prototipos/Comparativo_Regional_.png)
+![Comparativo Regional](ASSETS/docs/prototipos/Comparativo_Regional_.png)
 
-![Comparativo Regional](.ASSETS/docs/prototipos/Comparativo_Regional_2.png)
+![Comparativo Regional](ASSETS/docs/prototipos/Comparativo_Regional_2.png)
 
-![Peso dos Itens](.ASSETS/docs/prototipos/Peso_dos_itens.png)
+![Peso dos Itens](ASSETS/docs/prototipos/Peso_dos_itens.png)
 
-![Influencia Eventos Externos](.ASSETS/docs/prototipos/Influência_Eventos_Externos.png)
+![Influencia Eventos Externos](ASSETS/docs/prototipos/Influência_Eventos_Externos.png)
 
 
 ## 🗂️ Estrutura do Repositório
