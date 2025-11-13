@@ -49,7 +49,7 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 
 ![Peso dos Itens](ASSETS/docs/prototipos/Peso_dos_itens.png)
 
-![Influencia Eventos Externos](ASSETS/docs/prototipos/Influência_Eventos_Externos.png)
+![Influencia Eventos Externos](ASSETS/docs/prototipos/Influencia_Eventos_Externos.png)
 
 
 ## 🗂️ Estrutura do Repositório
