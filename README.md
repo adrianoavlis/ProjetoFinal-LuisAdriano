@@ -82,7 +82,3 @@ http://localhost:8081
 
 - **Luis Adriano da Silva** – Desenvolvedor e autor do TCC  
 - **Prof. João Felipe Pimentel** – Orientador, IC/UFF
-
-## 📄 Licença
-
-Este projeto está licenciado sob a MIT License.
