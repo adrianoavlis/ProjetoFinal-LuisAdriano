@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,9 +21,13 @@ public class IndexController {
     private final EvolucaoService evolucaoService;
     private final ObjectMapper objectMapper;
 
+    @Value("${google.maps.api-key:}")
+    private String googleMapsApiKey;
+
     @GetMapping("/")
     public String index(Model model) {
         popularDadosEvolucao(model);
+        model.addAttribute("googleMapsApiKey", googleMapsApiKey);
         return "index"; // busca index.jsp em /WEB-INF/views/
     }
 
