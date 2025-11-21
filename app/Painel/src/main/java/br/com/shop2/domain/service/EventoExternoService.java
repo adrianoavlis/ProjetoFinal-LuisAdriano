@@ -40,7 +40,7 @@ public class EventoExternoService {
             .appendPattern("MMM-uuuu")
             .toFormatter(Locale.ENGLISH);
 
-    private static final DateTimeFormatter PERIODO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+    private static final DateTimeFormatter PERIODO_FORMATTER = DateTimeFormatter.ofPattern("MM/yyyy");
 
     private final EventoExternoRepository eventoExternoRepository;
     private final CestaBasicaService cestaBasicaService;
