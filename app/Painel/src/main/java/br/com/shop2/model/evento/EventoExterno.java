@@ -1,13 +1,12 @@
 package br.com.shop2.model.evento;
 
 import br.com.shop2.model.common.BaseEntity;
-import br.com.shop2.model.common.Municipios;
-import br.com.shop2.model.converter.MunicipiosListaConverter;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -45,11 +44,9 @@ public class EventoExterno extends BaseEntity {
     @Column(name = "data_fim", nullable = false)
     private LocalDate dataFim;
 
-    @NotNull
-    @Convert(converter = MunicipiosListaConverter.class)
-    @Column(name = "municipio", nullable = false, columnDefinition = "TEXT")
+    @OneToMany(mappedBy = "eventoExterno", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Municipios> municipios = new ArrayList<>();
+    private List<EventoExternoMunicipio> municipios = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
