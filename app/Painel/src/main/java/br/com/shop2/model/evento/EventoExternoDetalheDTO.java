@@ -22,6 +22,7 @@ public class EventoExternoDetalheDTO {
     private LocalDate dataFim;
     private List<String> municipios;
     private List<String> municipiosId;
+    private String municipiosConcatenados;
     private Impacto impacto;
     private BigDecimal valorMedioCesta;
     private String periodoInicio;

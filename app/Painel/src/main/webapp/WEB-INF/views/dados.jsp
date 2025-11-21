@@ -334,7 +334,7 @@
                           </c:when>
                           <c:otherwise>
                             <c:forEach items="${eventosExternos}" var="evento">
-                              <c:set var="municipiosAttr" value="${evento.municipios != null ? fn:join(evento.municipios, ':::') : ''}" />
+                              <c:set var="municipiosAttr" value="${not empty evento.municipiosConcatenados ? evento.municipiosConcatenados : ''}" />
                               <tr>
                                 <td>
                                   <div class="fw-semibold">${evento.titulo}</div>

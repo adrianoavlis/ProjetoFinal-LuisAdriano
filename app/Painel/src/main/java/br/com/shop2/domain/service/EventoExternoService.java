@@ -169,6 +169,7 @@ public class EventoExternoService {
             .dataFim(evento.getDataFim())
             .municipios(municipiosEvento)
             .municipiosId(municipiosId)
+            .municipiosConcatenados(String.join(":::", municipiosEvento))
             .impacto(evento.getImpacto())
             .valorMedioCesta(valorMedio)
             .periodoInicio(periodoInicio != null ? PERIODO_FORMATTER.format(periodoInicio) : null)
