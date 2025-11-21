@@ -4790,7 +4790,9 @@ async function buildEventos(filtro){
       corTexto: corTexto,
       faixa: faixa,
       label: labelConteudo,
-      unico: startIndex === endIndex
+      unico: startIndex === endIndex,
+      startIndex: startIndex,
+      endIndex: endIndex
     });
   });
 
@@ -4839,12 +4841,42 @@ async function buildEventos(filtro){
       };
     });
 
+    var valoresPorLabel = serieData.reduce(function(acumulado, ponto){
+      if (ponto && ponto.x) {
+        acumulado[ponto.x] = ponto.value;
+      }
+      return acumulado;
+    }, {});
+
+    eventMarkers.forEach(function(markerInfo){
+      if (typeof markerInfo.startIndex !== 'number' || typeof markerInfo.endIndex !== 'number') {
+        return;
+      }
+      var areaData = chartLabels.map(function(label, idx){
+        if (idx < markerInfo.startIndex || idx > markerInfo.endIndex) {
+          return { x: label, value: null };
+        }
+        var valor = valoresPorLabel[label];
+        return { x: label, value: Number.isFinite(valor) ? valor : null };
+      });
+      var sombraSerie = chEventos.area(areaData);
+      sombraSerie.fill(markerInfo.faixa);
+      sombraSerie.stroke(null);
+      if (typeof sombraSerie.hovered === 'function') {
+        sombraSerie.hovered().fill(markerInfo.faixa);
+        sombraSerie.hovered().stroke(null);
+      }
+      sombraSerie.tooltip(false);
+      sombraSerie.zIndex(1);
+    });
+
     var serieEventos = chEventos.line(serieData);
     serieEventos.name('Cesta (R$)');
     serieEventos.stroke({ color: '#0f172a', thickness: 2 });
     serieEventos.hovered().stroke({ color: '#0f172a', thickness: 2 });
     serieEventos.markers().enabled(true).type('circle').size(4).fill('#0f172a').stroke('#ffffff');
     serieEventos.hovered().markers().enabled(true).size(6);
+    serieEventos.zIndex(3);
 
     chEventos.tooltip().useHtml(true);
     chEventos.tooltip().format(function(){
