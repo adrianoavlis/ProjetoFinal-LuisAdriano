@@ -4744,6 +4744,11 @@ async function buildEventos(filtro){
   var periodo = filtro ? filtro.periodo : null;
   var limites = obterLimitesPeriodo(periodo);
   var municipiosSelecionados = obterMunicipiosDoFiltro(filtro, 4);
+  var municipiosSelecionadosSet = new Set(
+    municipiosSelecionados
+      .map(function(id){ return String(id || '').trim().toUpperCase(); })
+      .filter(function(id){ return !!id; })
+  );
 
   if (EVENTOS_EXTERNOS_URL) {
     var params = new URLSearchParams();
@@ -4771,6 +4776,31 @@ async function buildEventos(filtro){
   }
 
   eventosExternosCache = Array.isArray(eventosExternosBase) ? eventosExternosBase.slice() : [];
+  if (municipiosSelecionadosSet.size) {
+    eventosExternosCache = eventosExternosCache.filter(function(ev){
+      var municipiosEvento = [];
+      if (Array.isArray(ev.municipiosId) && ev.municipiosId.length) {
+        municipiosEvento = ev.municipiosId;
+      } else if (Array.isArray(ev.municipios) && ev.municipios.length) {
+        municipiosEvento = ev.municipios.map(function(item){
+          if (item && typeof item === 'object') {
+            return item.id || item.nome || item;
+          }
+          return item;
+        });
+      }
+
+      var municipiosNormalizados = municipiosEvento
+        .map(function(id){ return String(id || '').trim().toUpperCase(); })
+        .filter(function(id){ return !!id; });
+
+      if (!municipiosNormalizados.length) {
+        return false;
+      }
+
+      return municipiosNormalizados.some(function(id){ return municipiosSelecionadosSet.has(id); });
+    });
+  }
   eventosExternosCache.sort(compararEventosPorPeriodo);
 
   var serieFiltrada = filtrarSeriePorPeriodo(evolucaoHistorica, periodo);
