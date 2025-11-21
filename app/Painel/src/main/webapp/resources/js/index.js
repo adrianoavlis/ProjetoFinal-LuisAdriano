@@ -4679,6 +4679,12 @@ function desenharGraficosPeso(componentes){
 async function buildEventos(filtro){
   var periodo = filtro ? filtro.periodo : null;
   var limites = obterLimitesPeriodo(periodo);
+  var canvasEventos = document.getElementById('chEventos');
+  var wrapEventos = canvasEventos ? canvasEventos.closest('.chart-wrap') : null;
+
+  if (wrapEventos) {
+    wrapEventos.classList.remove('chart-wrap--empty');
+  }
 
   if (EVENTOS_EXTERNOS_URL) {
     var params = new URLSearchParams();
@@ -4710,6 +4716,9 @@ async function buildEventos(filtro){
   var serieFiltrada = filtrarSeriePorPeriodo(evolucaoHistorica, periodo);
   if (!serieFiltrada.length && evolucaoHistorica.length) {
     serieFiltrada = evolucaoHistorica.slice();
+  }
+  if (!serieFiltrada.length && SERIE_HISTORICA_MOCK.length) {
+    serieFiltrada = SERIE_HISTORICA_MOCK.slice();
   }
 
   var labelsIso = serieFiltrada.map(function(r){ return r.mes; });
@@ -4798,126 +4807,136 @@ async function buildEventos(filtro){
 
   var canvasEventos = document.getElementById('chEventos');
   if (canvasEventos) {
-    if (chEventos && typeof chEventos.dispose === 'function') {
-      chEventos.dispose();
-    }
-    canvasEventos.innerHTML = '';
-
-    var formatarEventosTooltip = function(eventos){
-      if (!Array.isArray(eventos) || !eventos.length) {
-        return '';
+    if (!chartLabels.length) {
+      if (wrapEventos) {
+        wrapEventos.classList.add('chart-wrap--empty');
       }
-      return eventos.map(function(info){
-        var partes = [info.titulo + ' • ' + info.impacto];
-        var detalhes = [];
-        if (info.descricao) detalhes.push(info.descricao);
-        if (info.fonte) detalhes.push('Fonte: ' + info.fonte);
-        if (info.link) detalhes.push('Mais informações: ' + info.link);
-        if (detalhes.length) {
-          partes.push(detalhes.join('<br/>'));
+      if (chEventos && typeof chEventos.dispose === 'function') {
+        chEventos.dispose();
+        chEventos = null;
+      }
+    } else {
+      if (chEventos && typeof chEventos.dispose === 'function') {
+        chEventos.dispose();
+      }
+      canvasEventos.innerHTML = '';
+
+      var formatarEventosTooltip = function(eventos){
+        if (!Array.isArray(eventos) || !eventos.length) {
+          return '';
         }
-        return partes.join('<br/>');
-      }).join('<br/><br/>');
-    };
-
-    chEventos = anychart.cartesian();
-    chEventos.animation(true);
-    chEventos.background().fill('transparent');
-    chEventos.xScale().mode('ordinal');
-    chEventos.crosshair().enabled(true).yLabel(false).yStroke(null);
-    chEventos.interactivity().hoverMode('by-x');
-    chEventos.legend(false);
-    chEventos.xAxis().labels().fontColor('#64748b');
-    chEventos.yAxis().labels().format(function(){
-      return Number.isFinite(this.value) ? brl(this.value) : '—';
-    }).fontColor('#64748b');
-
-    var serieData = serieFiltrada.map(function(r, idx){
-      var valor = r.cesta;
-      return {
-        x: chartLabels[idx],
-        value: Number.isFinite(valor) ? valor : null,
-        eventos: eventosPorIndice[idx]
+        return eventos.map(function(info){
+          var partes = [info.titulo + ' • ' + info.impacto];
+          var detalhes = [];
+          if (info.descricao) detalhes.push(info.descricao);
+          if (info.fonte) detalhes.push('Fonte: ' + info.fonte);
+          if (info.link) detalhes.push('Mais informações: ' + info.link);
+          if (detalhes.length) {
+            partes.push(detalhes.join('<br/>'));
+          }
+          return partes.join('<br/>');
+        }).join('<br/><br/>');
       };
-    });
 
-    var valoresPorLabel = serieData.reduce(function(acumulado, ponto){
-      if (ponto && ponto.x) {
-        acumulado[ponto.x] = ponto.value;
-      }
-      return acumulado;
-    }, {});
+      chEventos = anychart.cartesian();
+      chEventos.animation(true);
+      chEventos.background().fill('transparent');
+      chEventos.xScale().mode('ordinal');
+      chEventos.crosshair().enabled(true).yLabel(false).yStroke(null);
+      chEventos.interactivity().hoverMode('by-x');
+      chEventos.legend(false);
+      chEventos.xAxis().labels().fontColor('#64748b');
+      chEventos.yAxis().labels().format(function(){
+        return Number.isFinite(this.value) ? brl(this.value) : '—';
+      }).fontColor('#64748b');
 
-    eventMarkers.forEach(function(markerInfo){
-      if (typeof markerInfo.startIndex !== 'number' || typeof markerInfo.endIndex !== 'number') {
-        return;
-      }
-      var areaData = chartLabels.map(function(label, idx){
-        if (idx < markerInfo.startIndex || idx > markerInfo.endIndex) {
-          return { x: label, value: null };
-        }
-        var valor = valoresPorLabel[label];
-        return { x: label, value: Number.isFinite(valor) ? valor : null };
+      var serieData = serieFiltrada.map(function(r, idx){
+        var valor = r.cesta;
+        return {
+          x: chartLabels[idx],
+          value: Number.isFinite(valor) ? valor : null,
+          eventos: eventosPorIndice[idx]
+        };
       });
-      var sombraSerie = chEventos.area(areaData);
-      sombraSerie.fill(markerInfo.faixa);
-      sombraSerie.stroke(null);
-      if (typeof sombraSerie.hovered === 'function') {
-        sombraSerie.hovered().fill(markerInfo.faixa);
-        sombraSerie.hovered().stroke(null);
-      }
-      sombraSerie.tooltip(false);
-      sombraSerie.zIndex(1);
-    });
 
-    var serieEventos = chEventos.line(serieData);
-    serieEventos.name('Cesta (R$)');
-    serieEventos.stroke({ color: '#0f172a', thickness: 2 });
-    serieEventos.hovered().stroke({ color: '#0f172a', thickness: 2 });
-    serieEventos.markers().enabled(true).type('circle').size(4).fill('#0f172a').stroke('#ffffff');
-    serieEventos.hovered().markers().enabled(true).size(6);
-    serieEventos.zIndex(3);
+      var valoresPorLabel = serieData.reduce(function(acumulado, ponto){
+        if (ponto && ponto.x) {
+          acumulado[ponto.x] = ponto.value;
+        }
+        return acumulado;
+      }, {});
 
-    chEventos.tooltip().useHtml(true);
-    chEventos.tooltip().format(function(){
-      var valor = Number.isFinite(this.value) ? brl(this.value) : '—';
-      var eventos = typeof this.getData === 'function' ? this.getData('eventos') : null;
-      var extras = formatarEventosTooltip(eventos);
-      if (extras) {
-        return this.seriesName + ': ' + valor + '<br/>' + extras;
-      }
-      return this.seriesName + ': ' + valor;
-    });
+      eventMarkers.forEach(function(markerInfo){
+        if (typeof markerInfo.startIndex !== 'number' || typeof markerInfo.endIndex !== 'number') {
+          return;
+        }
+        var areaData = chartLabels.map(function(label, idx){
+          if (idx < markerInfo.startIndex || idx > markerInfo.endIndex) {
+            return { x: label, value: null };
+          }
+          var valor = valoresPorLabel[label];
+          return { x: label, value: Number.isFinite(valor) ? valor : null };
+        });
+        var sombraSerie = chEventos.area(areaData);
+        sombraSerie.fill(markerInfo.faixa);
+        sombraSerie.stroke(null);
+        if (typeof sombraSerie.hovered === 'function') {
+          sombraSerie.hovered().fill(markerInfo.faixa);
+          sombraSerie.hovered().stroke(null);
+        }
+        sombraSerie.tooltip(false);
+        sombraSerie.zIndex(1);
+      });
 
-    eventMarkers.forEach(function(markerInfo){
-      var marker = chEventos.rangeMarker();
-      marker.from(markerInfo.inicio);
-      if (markerInfo.inicio === markerInfo.fim) {
-        var idxAtual = chartLabels.indexOf(markerInfo.fim);
-        var proximo = chartLabels[idxAtual + 1] || markerInfo.fim;
-        marker.to(proximo);
-        marker.stroke({ color: markerInfo.cor, thickness: 2, dash: '6 6' });
-        marker.fill('transparent');
-      } else {
-        marker.to(markerInfo.fim);
-        marker.fill(markerInfo.faixa);
-        marker.stroke({ color: markerInfo.cor, thickness: 1 });
-      }
-      marker.zIndex(0);
-      if (typeof marker.labels === 'function') {
-        marker.labels().enabled(true);
-        marker.labels().useHtml(true);
-        marker.labels().format(markerInfo.label);
-        marker.labels().fontColor(markerInfo.corTexto);
-        marker.labels().background({ fill: 'rgba(255,255,255,0.85)', stroke: markerInfo.cor });
-        marker.labels().padding(5);
-        marker.labels().anchor('left-top');
-        marker.labels().offsetY(5);
-      }
-    });
+      var serieEventos = chEventos.line(serieData);
+      serieEventos.name('Cesta (R$)');
+      serieEventos.stroke({ color: '#0f172a', thickness: 2 });
+      serieEventos.hovered().stroke({ color: '#0f172a', thickness: 2 });
+      serieEventos.markers().enabled(true).type('circle').size(4).fill('#0f172a').stroke('#ffffff');
+      serieEventos.hovered().markers().enabled(true).size(6);
+      serieEventos.zIndex(3);
 
-    chEventos.container(canvasEventos);
-    chEventos.draw();
+      chEventos.tooltip().useHtml(true);
+      chEventos.tooltip().format(function(){
+        var valor = Number.isFinite(this.value) ? brl(this.value) : '—';
+        var eventos = typeof this.getData === 'function' ? this.getData('eventos') : null;
+        var extras = formatarEventosTooltip(eventos);
+        if (extras) {
+          return this.seriesName + ': ' + valor + '<br/>' + extras;
+        }
+        return this.seriesName + ': ' + valor;
+      });
+
+      eventMarkers.forEach(function(markerInfo){
+        var marker = chEventos.rangeMarker();
+        marker.from(markerInfo.inicio);
+        if (markerInfo.inicio === markerInfo.fim) {
+          var idxAtual = chartLabels.indexOf(markerInfo.fim);
+          var proximo = chartLabels[idxAtual + 1] || markerInfo.fim;
+          marker.to(proximo);
+          marker.stroke({ color: markerInfo.cor, thickness: 2, dash: '6 6' });
+          marker.fill('transparent');
+        } else {
+          marker.to(markerInfo.fim);
+          marker.fill(markerInfo.faixa);
+          marker.stroke({ color: markerInfo.cor, thickness: 1 });
+        }
+        marker.zIndex(0);
+        if (typeof marker.labels === 'function') {
+          marker.labels().enabled(true);
+          marker.labels().useHtml(true);
+          marker.labels().format(markerInfo.label);
+          marker.labels().fontColor(markerInfo.corTexto);
+          marker.labels().background({ fill: 'rgba(255,255,255,0.85)', stroke: markerInfo.cor });
+          marker.labels().padding(5);
+          marker.labels().anchor('left-top');
+          marker.labels().offsetY(5);
+        }
+      });
+
+      chEventos.container(canvasEventos);
+      chEventos.draw();
+    }
   }
 
   var eventosVisiveis = eventosExternosCache.filter(function(ev){
