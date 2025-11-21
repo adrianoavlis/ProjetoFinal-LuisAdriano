@@ -17,7 +17,7 @@ public class EvolucaoRepository {
     private final GastoMensalRepository gastoMensalRepository;
 
     public List<GastoMensal> buscarPorFiltro(EvolucaoFiltro filtro) {
-        Specification<GastoMensal> spec = Specification.where(null);
+        Specification<GastoMensal> spec = null;
 
         YearMonth mesInicio = filtro != null ? filtro.getMesInicio() : null;
         YearMonth mesFim = filtro != null ? filtro.getMesFim() : null;
