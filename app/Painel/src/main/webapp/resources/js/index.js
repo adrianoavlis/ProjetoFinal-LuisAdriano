@@ -3512,6 +3512,129 @@ function formatarPeriodoEvento(evento){
   return inicioTexto + ' – ' + fimTexto;
 }
 
+function expandirIntervaloMensal(inicioKey, fimKey){
+  var inicioInfo = extrairAnoMesInfo(inicioKey);
+  var fimInfo = extrairAnoMesInfo(fimKey || inicioKey || fimKey);
+  if (!inicioInfo && !fimInfo){
+    return [];
+  }
+  if (!inicioInfo) inicioInfo = fimInfo;
+  if (!fimInfo) fimInfo = inicioInfo;
+  var cursorAno = inicioInfo.ano;
+  var cursorMes = inicioInfo.mes;
+  var fimValor = fimInfo.ano * 12 + fimInfo.mes;
+  var atualValor = cursorAno * 12 + cursorMes;
+  if (fimValor < atualValor){
+    var troca = fimValor;
+    fimValor = atualValor;
+    atualValor = troca;
+    cursorAno = fimInfo.ano;
+    cursorMes = fimInfo.mes;
+  }
+  var resultado = [];
+  while (atualValor <= fimValor){
+    resultado.push(cursorAno + '-' + String(cursorMes).padStart(2,'0'));
+    cursorMes += 1;
+    if (cursorMes > 12){
+      cursorMes = 1;
+      cursorAno += 1;
+    }
+    atualValor = cursorAno * 12 + cursorMes - 1;
+  }
+  return resultado;
+}
+
+function formatarMesCurto(chave){
+  var info = extrairAnoMesInfo(chave);
+  if (!info){
+    return chave;
+  }
+  return MONTH_FORMATTER.format(new Date(Date.UTC(info.ano, info.mes - 1, 1)));
+}
+
+function construirMapaCestaMensal(serie){
+  var mapa = new Map();
+  if (!Array.isArray(serie)){
+    return mapa;
+  }
+  serie.forEach(function(ponto){
+    if (!ponto) return;
+    var chave = normalizarPeriodoChave(ponto.mes);
+    var valor = Number(ponto.cesta);
+    if (!chave || Number.isNaN(valor)) return;
+    mapa.set(chave, valor);
+  });
+  return mapa;
+}
+
+function detalharEventoParaTooltip(evento){
+  if (!evento) return null;
+  var impactoInfo = obterCoresImpacto(evento.impacto);
+  return {
+    titulo: evento.titulo || evento.rotulo || 'Evento',
+    impacto: rotuloImpacto(evento.impacto),
+    badge: impactoInfo.badge,
+    descricao: evento.descricao || evento.comentario || '',
+    periodo: formatarPeriodoEvento(evento)
+  };
+}
+
+function agruparEventosPorMes(eventos, mesesOrdenados){
+  var mapa = new Map();
+  (mesesOrdenados || []).forEach(function(mes){
+    mapa.set(mes, { total: 0, positivos: 0, negativos: 0, lista: [] });
+  });
+
+  if (!Array.isArray(eventos)){
+    return mapa;
+  }
+
+  eventos.forEach(function(ev){
+    var inicio = normalizarPeriodoChave(ev.periodoInicio || ev.dataInicio);
+    var fim = normalizarPeriodoChave(ev.periodoFim || ev.periodoInicio || ev.dataFim) || inicio;
+    var faixa = expandirIntervaloMensal(inicio, fim);
+    if (!faixa.length){
+      return;
+    }
+    var detalhe = detalharEventoParaTooltip(ev);
+    faixa.forEach(function(mesChave){
+      if (!mapa.has(mesChave)) return;
+      var alvo = mapa.get(mesChave);
+      alvo.total += 1;
+      var impacto = normalizarImpacto(ev.impacto);
+      if (impacto === 'POSITIVO') alvo.positivos += 1;
+      if (impacto === 'NEGATIVO') alvo.negativos += 1;
+      if (detalhe){
+        alvo.lista.push(detalhe);
+      }
+    });
+  });
+
+  return mapa;
+}
+
+function formatarEventosTooltipLista(eventos){
+  if (!Array.isArray(eventos) || !eventos.length){
+    return '';
+  }
+  return eventos.map(function(info){
+    var partes = [];
+    if (info.titulo){
+      partes.push('<strong>' + info.titulo + '</strong>');
+    }
+    if (info.periodo){
+      partes.push('<span>' + info.periodo + '</span>');
+    }
+    if (info.impacto){
+      partes.push('<span class="badge ' + (info.badge || 'bg-secondary-subtle text-secondary') + '">' + info.impacto + '</span>');
+    }
+    if (info.descricao){
+      partes.push('<div class="text-muted">' + info.descricao + '</div>');
+    }
+    return partes.join('<br/>');
+  }).join('<br/><br/>');
+}
+
 function calcularValorMedioLocal(periodoInicio, periodoFim){
   var inicio = normalizarPeriodoChave(periodoInicio);
   var fim = normalizarPeriodoChave(periodoFim || periodoInicio) || inicio;
@@ -4725,239 +4848,123 @@ async function buildEventos(filtro){
     return;
   }
 
-  var labelsIso = serieFiltrada.map(function(r){ return r.mes; });
-  var labelKeys = labelsIso.map(function(m){
-    var info = extrairAnoMesInfo(m);
-    return { raw: m, key: info ? info.label : normalizarPeriodoChave(m) };
-  });
-  var chartLabels = labelKeys.map(function(item){
-    var info = extrairAnoMesInfo(item.raw);
-    if (!info) {
-      return item.raw;
-    }
-    var data = new Date(Date.UTC(info.ano, info.mes - 1, 1));
-    return MONTH_FORMATTER.format(data);
-  });
-
-  var eventosPorIndice = chartLabels.map(function(){ return []; });
-  var eventMarkers = [];
-  var firstKey = labelKeys.length ? labelKeys[0].key : null;
-  var lastKey = labelKeys.length ? labelKeys[labelKeys.length - 1].key : null;
-
-  var encontrarInicio = function(chave){
-    for (var i = 0; i < labelKeys.length; i++) {
-      if (labelKeys[i].key >= chave) {
-        return i;
-      }
-    }
-    return labelKeys.length - 1;
-  };
-
-  var encontrarFim = function(chave){
-    for (var j = labelKeys.length - 1; j >= 0; j--) {
-      if (labelKeys[j].key <= chave) {
-        return j;
-      }
-    }
-    return 0;
-  };
-
-  eventosExternosCache.forEach(function(ev){
-    var inicio = normalizarPeriodoChave(ev.periodoInicio || ev.dataInicio);
-    var fim = normalizarPeriodoChave(ev.periodoFim || ev.periodoInicio || ev.dataFim) || inicio;
-    if (!inicio || !firstKey || !lastKey) {
-      return;
-    }
-    if (fim && fim < inicio) {
-      var troca = inicio;
-      inicio = fim;
-      fim = troca;
-    }
-
-    var inicioClamped = inicio < firstKey ? firstKey : inicio;
-    var fimClamped = fim && fim > lastKey ? lastKey : (fim || inicioClamped);
-    if (inicioClamped > lastKey || fimClamped < firstKey) {
-      return;
-    }
-
-    var startIndex = encontrarInicio(inicioClamped);
-    var endIndex = encontrarFim(fimClamped);
-    if (startIndex > endIndex) {
-      var invert = startIndex;
-      startIndex = endIndex;
-      endIndex = invert;
-    }
-
-    var startLabel = chartLabels[startIndex];
-    var endLabel = chartLabels[endIndex];
-
-    var coresImpacto = obterCoresImpacto(ev.impacto);
-    var cor = coresImpacto.cor;
-    var corTexto = coresImpacto.texto;
-    var faixa = coresImpacto.faixa;
-    var titulo = ev.titulo || ev.rotulo || 'Evento';
-    var labelConteudo = titulo + ' • ' + rotuloImpacto(ev.impacto);
-
-    var tooltipInfo = {
-      titulo: titulo,
-      impacto: rotuloImpacto(ev.impacto),
-      descricao: ev.descricao || ev.comentario || '',
-      fonte: ev.fonte || ev.origem || '',
-      link: ev.link || ev.url || ''
-    };
-
-    for (var idx = startIndex; idx <= endIndex; idx++) {
-      if (eventosPorIndice[idx]) {
-        eventosPorIndice[idx].push(tooltipInfo);
-      }
-    }
-
-    eventMarkers.push({
-      inicio: startLabel,
-      fim: endLabel,
-      cor: cor,
-      corTexto: corTexto,
-      faixa: faixa,
-      label: labelConteudo,
-      unico: startIndex === endIndex,
-      startIndex: startIndex,
-      endIndex: endIndex
-    });
-  });
-
-  var canvasEventos = document.getElementById('chEventos');
-  if (canvasEventos) {
-    if (!chartLabels.length) {
-      if (wrapEventos) {
-        wrapEventos.classList.add('chart-wrap--empty');
-      }
-      if (chEventos && typeof chEventos.dispose === 'function') {
-        chEventos.dispose();
-        chEventos = null;
-      }
-    } else {
-      if (chEventos && typeof chEventos.dispose === 'function') {
-        chEventos.dispose();
-      }
-      canvasEventos.innerHTML = '';
-
-      var formatarEventosTooltip = function(eventos){
-        if (!Array.isArray(eventos) || !eventos.length) {
-          return '';
-        }
-        return eventos.map(function(info){
-          var partes = [info.titulo + ' • ' + info.impacto];
-          var detalhes = [];
-          if (info.descricao) detalhes.push(info.descricao);
-          if (info.fonte) detalhes.push('Fonte: ' + info.fonte);
-          if (info.link) detalhes.push('Mais informações: ' + info.link);
-          if (detalhes.length) {
-            partes.push(detalhes.join('<br/>'));
-          }
-          return partes.join('<br/>');
-        }).join('<br/><br/>');
-      };
-
-      chEventos = anychart.cartesian();
-      chEventos.animation(true);
-      chEventos.background().fill('transparent');
-      chEventos.xScale().mode('ordinal');
-      chEventos.crosshair().enabled(true).yLabel(false).yStroke(null);
-      chEventos.interactivity().hoverMode('by-x');
-      chEventos.legend(false);
-      chEventos.xAxis().labels().fontColor('#64748b');
-      chEventos.yAxis().labels().format(function(){
-        return Number.isFinite(this.value) ? brl(this.value) : '—';
-      }).fontColor('#64748b');
-
-      var serieData = serieFiltrada.map(function(r, idx){
-        var valor = r.cesta;
-        return {
-          x: chartLabels[idx],
-          value: Number.isFinite(valor) ? valor : null,
-          eventos: eventosPorIndice[idx]
-        };
-      });
-
-      var valoresPorLabel = serieData.reduce(function(acumulado, ponto){
-        if (ponto && ponto.x) {
-          acumulado[ponto.x] = ponto.value;
-        }
-        return acumulado;
-      }, {});
-
-      eventMarkers.forEach(function(markerInfo){
-        if (typeof markerInfo.startIndex !== 'number' || typeof markerInfo.endIndex !== 'number') {
-          return;
-        }
-        var areaData = chartLabels.map(function(label, idx){
-          if (idx < markerInfo.startIndex || idx > markerInfo.endIndex) {
-            return { x: label, value: null };
-          }
-          var valor = valoresPorLabel[label];
-          return { x: label, value: Number.isFinite(valor) ? valor : null };
-        });
-        var sombraSerie = chEventos.area(areaData);
-        sombraSerie.fill(markerInfo.faixa);
-        sombraSerie.stroke(null);
-        if (typeof sombraSerie.hovered === 'function') {
-          sombraSerie.hovered().fill(markerInfo.faixa);
-          sombraSerie.hovered().stroke(null);
-        }
-        sombraSerie.tooltip(false);
-        sombraSerie.zIndex(1);
-      });
-
-      var serieEventos = chEventos.line(serieData);
-      serieEventos.name('Cesta (R$)');
-      serieEventos.stroke({ color: '#0f172a', thickness: 2 });
-      serieEventos.hovered().stroke({ color: '#0f172a', thickness: 2 });
-      serieEventos.markers().enabled(true).type('circle').size(4).fill('#0f172a').stroke('#ffffff');
-      serieEventos.hovered().markers().enabled(true).size(6);
-      serieEventos.zIndex(3);
-
-      chEventos.tooltip().useHtml(true);
-      chEventos.tooltip().format(function(){
-        var valor = Number.isFinite(this.value) ? brl(this.value) : '—';
-        var eventos = typeof this.getData === 'function' ? this.getData('eventos') : null;
-        var extras = formatarEventosTooltip(eventos);
-        if (extras) {
-          return this.seriesName + ': ' + valor + '<br/>' + extras;
-        }
-        return this.seriesName + ': ' + valor;
-      });
-
-      eventMarkers.forEach(function(markerInfo){
-        var marker = chEventos.rangeMarker();
-        marker.from(markerInfo.inicio);
-        if (markerInfo.inicio === markerInfo.fim) {
-          var idxAtual = chartLabels.indexOf(markerInfo.fim);
-          var proximo = chartLabels[idxAtual + 1] || markerInfo.fim;
-          marker.to(proximo);
-          marker.stroke({ color: markerInfo.cor, thickness: 2, dash: '6 6' });
-          marker.fill('transparent');
-        } else {
-          marker.to(markerInfo.fim);
-          marker.fill(markerInfo.faixa);
-          marker.stroke({ color: markerInfo.cor, thickness: 1 });
-        }
-        marker.zIndex(0);
-        if (typeof marker.labels === 'function') {
-          marker.labels().enabled(true);
-          marker.labels().useHtml(true);
-          marker.labels().format(markerInfo.label);
-          marker.labels().fontColor(markerInfo.corTexto);
-          marker.labels().background({ fill: 'rgba(255,255,255,0.85)', stroke: markerInfo.cor });
-          marker.labels().padding(5);
-          marker.labels().anchor('left-top');
-          marker.labels().offsetY(5);
-        }
-      });
-
-      chEventos.container(canvasEventos);
-      chEventos.draw();
-    }
+  var mesesDisponiveis = obterMesesDoPeriodo(periodo).map(normalizarPeriodoChave).filter(Boolean);
+  var mesesSerie = serieFiltrada.map(function(r){ return normalizarPeriodoChave(r.mes); }).filter(Boolean);
+  var mesesValidos = mesesDisponiveis.filter(function(m){ return mesesSerie.includes(m); });
+  if (!mesesValidos.length){
+    mesesValidos = mesesSerie.slice();
   }
+
+  var mesesOrdenados = Array.from(new Set(mesesValidos)).sort();
+  if (!mesesOrdenados.length){
+    if (wrapEventos) {
+      wrapEventos.classList.add('chart-wrap--empty');
+    }
+    if (chEventos && typeof chEventos.dispose === 'function') {
+      chEventos.dispose();
+      chEventos = null;
+    }
+    return;
+  }
+
+  var labels = mesesOrdenados.map(formatarMesCurto);
+  var cestaPorMes = construirMapaCestaMensal(serieFiltrada);
+  var eventosAgrupados = agruparEventosPorMes(eventosExternosCache, mesesOrdenados);
+
+  if (canvasEventos) {
+    canvasEventos.innerHTML = '';
+  }
+
+  if (chEventos && typeof chEventos.dispose === 'function') {
+    chEventos.dispose();
+    chEventos = null;
+  }
+
+  var escalaEventos = anychart.scales.linear();
+  escalaEventos.minimum(0);
+
+  chEventos = anychart.cartesian();
+  chEventos.animation(true);
+  chEventos.background().fill('transparent');
+  chEventos.xScale().mode('ordinal');
+  chEventos.crosshair().enabled(true).yLabel(false).yStroke(null);
+  chEventos.interactivity().hoverMode('by-x');
+  chEventos.legend(true);
+  chEventos.legend().align('center').itemsLayout('horizontal-expandable');
+  chEventos.xAxis().labels().fontColor('#64748b');
+  chEventos.yAxis().labels().format(function(){
+    return Number.isFinite(this.value) ? brl(this.value) : '—';
+  }).fontColor('#64748b');
+  chEventos.yAxis().title('Cesta média (R$)');
+
+  var eixoEventos = chEventos.yAxis(1);
+  eixoEventos.orientation('right');
+  eixoEventos.scale(escalaEventos);
+  eixoEventos.labels().format(function(){
+    return Number.isFinite(this.value) ? this.value : '—';
+  }).fontColor('#475569');
+  eixoEventos.title('Eventos');
+
+  var areaData = mesesOrdenados.map(function(mes, idx){
+    var valor = cestaPorMes.has(mes) ? cestaPorMes.get(mes) : null;
+    return {
+      x: labels[idx],
+      chave: mes,
+      value: Number.isFinite(valor) ? valor : null,
+      eventos: eventosAgrupados.has(mes) ? eventosAgrupados.get(mes).lista : []
+    };
+  });
+
+  var eventosData = mesesOrdenados.map(function(mes, idx){
+    var agrupamento = eventosAgrupados.get(mes) || { total: 0, lista: [] };
+    return {
+      x: labels[idx],
+      chave: mes,
+      value: agrupamento.total,
+      eventos: agrupamento.lista
+    };
+  });
+
+  var sombra = chEventos.area(areaData);
+  sombra.name('Média da cesta');
+  sombra.stroke({ color: '#0ea5e9', thickness: 2 });
+  sombra.fill('rgba(14,165,233,0.28)');
+  sombra.markers(true);
+  sombra.markers().type('circle').size(4).fill('#0ea5e9').stroke('#ffffff');
+  sombra.hovered().markers().enabled(true).size(6);
+  sombra.zIndex(2);
+  sombra.tooltip().useHtml(true).format(function(){
+    var valor = Number.isFinite(this.value) ? brl(this.value) : '—';
+    var extras = formatarEventosTooltipLista(this.getData('eventos'));
+    if (extras){
+      return this.seriesName + ': ' + valor + '<br/>' + extras;
+    }
+    return this.seriesName + ': ' + valor;
+  });
+
+  var linha = chEventos.line(areaData);
+  linha.name('Linha de tendência');
+  linha.stroke({ color: '#0f172a', thickness: 2.5 });
+  linha.hovered().stroke({ color: '#0f172a', thickness: 3 });
+  linha.markers().enabled(false);
+  linha.tooltip(false);
+  linha.zIndex(3);
+
+  var colunasEventos = chEventos.column(eventosData);
+  colunasEventos.name('Eventos registrados');
+  colunasEventos.yScale(escalaEventos);
+  colunasEventos.stroke(null);
+  colunasEventos.fill('#0284c7');
+  colunasEventos.hovered().fill('#0369a1');
+  colunasEventos.zIndex(1);
+  colunasEventos.tooltip().useHtml(true).format(function(){
+    var extras = formatarEventosTooltipLista(this.getData('eventos'));
+    var titulo = this.seriesName + ': ' + (Number.isFinite(this.value) ? this.value : 0);
+    return extras ? titulo + '<br/>' + extras : titulo;
+  });
+
+  chEventos.container(canvasEventos);
+  chEventos.draw();
 
   var eventosVisiveis = eventosExternosCache.filter(function(ev){
     var inicio = normalizarPeriodoChave(ev.periodoInicio || ev.dataInicio);
