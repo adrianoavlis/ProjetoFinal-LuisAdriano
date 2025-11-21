@@ -46,7 +46,7 @@ public class EventoExterno extends BaseEntity {
 
     @NotNull
     @Convert(converter = MunicipiosListaConverter.class)
-    @Column(name = "municipio", nullable = false, length = 1000)
+    @Column(name = "municipio", nullable = false, columnDefinition = "TEXT")
     @Builder.Default
     private List<String> municipios = new ArrayList<>();
 
