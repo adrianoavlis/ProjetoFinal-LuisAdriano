@@ -93,10 +93,12 @@ public class EventoExternoService {
         eventoExternoRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<EventoExternoDetalheDTO> listarTodos() {
         return converterParaDetalhe(eventoExternoRepository.findAll(), null, null);
     }
 
+    @Transactional(readOnly = true)
     public List<EventoExternoDetalheDTO> buscarPorFiltro(Collection<String> municipios,
                                                          LocalDate dataInicio,
                                                          LocalDate dataFim) {
