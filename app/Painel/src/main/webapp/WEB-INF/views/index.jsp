@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cesta Básica – Painel Analítico (JSP + Bootstrap)</title>
+  <title>Painel Analítico Cesta Básica</title>
 
   <!-- Bootstrap 5 (CSS + JS) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
@@ -28,7 +28,7 @@
   <header class="bg-white border-bottom sticky-top shadow-sm">
     <nav class="navbar navbar-expand-lg navbar-light bg-white" aria-label="Navegação principal">
       <div class="container py-2 py-lg-3">
-        <a class="navbar-brand fw-semibold" href="#topo">Painel Analítico - Cesta Básica</a>
+        <a class="navbar-brand fw-semibold" href="#topo">Painel Analítico Cesta Básica</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Alternar navegação">
           <span class="navbar-toggler-icon"></span>
         </button>
