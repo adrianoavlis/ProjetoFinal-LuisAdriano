@@ -362,11 +362,11 @@
                                   <c:choose>
                                     <c:when test="${not empty evento.municipios}">
                                       <div class="municipios-box">
-                                        <ul class="list-unstyled mb-0 small">
+                                        <select class="form-select form-select-sm" multiple size="4" disabled aria-label="Municípios impactados">
                                           <c:forEach items="${evento.municipios}" var="mun">
-                                            <li class="text-break">${mun}</li>
+                                            <option class="text-break">${mun}</option>
                                           </c:forEach>
-                                        </ul>
+                                        </select>
                                       </div>
                                     </c:when>
                                     <c:otherwise>
