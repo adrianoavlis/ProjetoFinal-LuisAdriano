@@ -58,22 +58,6 @@
       padding-bottom: 2rem;
     }
 
-    .municipios-box {
-      max-height: 140px;
-      overflow: auto;
-      padding: 0.5rem 0.75rem;
-      background-color: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-    }
-
-    .municipios-box ul {
-      margin-bottom: 0;
-    }
-
-    .municipios-box li + li {
-      margin-top: 0.25rem;
-    }
   </style>
 </head>
 <body id="topo" class="bg-light">
@@ -267,39 +251,6 @@
                         <input type="text" id="eventoTitulo" name="titulo" class="form-control" maxlength="150"
                                value="${fn:escapeXml(eventoForm.titulo)}" required />
                       </div>
-                      <div class="col-12">
-                        <label for="eventoMunicipios" class="form-label">Municípios impactados</label>
-                        <select id="eventoMunicipios" name="municipios" class="form-select" multiple size="6" required>
-                          <c:if test="${empty eventoForm.municipios}">
-                            <option value="" disabled>Selecione um ou mais municípios...</option>
-                          </c:if>
-                          <c:forEach items="${municipiosEventos}" var="mun">
-                            <c:set var="municipioSelecionado" value="false" />
-                            <c:if test="${not empty eventoForm.municipios}">
-                              <c:forEach items="${eventoForm.municipios}" var="munSel">
-                                <c:if test="${munSel == mun}">
-                                  <c:set var="municipioSelecionado" value="true" />
-                                </c:if>
-                              </c:forEach>
-                            </c:if>
-                            <option value="${fn:escapeXml(mun)}"<c:if test="${municipioSelecionado}"> selected</c:if>>${mun}</option>
-                          </c:forEach>
-                          <c:forEach items="${eventoForm.municipios}" var="munSel">
-                            <c:if test="${not empty munSel}">
-                              <c:set var="municipioDisponivel" value="false" />
-                              <c:forEach items="${municipiosEventos}" var="munDisponivel">
-                                <c:if test="${munDisponivel == munSel}">
-                                  <c:set var="municipioDisponivel" value="true" />
-                                </c:if>
-                              </c:forEach>
-                              <c:if test="${not municipioDisponivel}">
-                                <option value="${fn:escapeXml(munSel)}" selected>${munSel}</option>
-                              </c:if>
-                            </c:if>
-                          </c:forEach>
-                        </select>
-                        <div class="form-text">Use Ctrl (ou Command no macOS) para selecionar múltiplos municípios.</div>
-                      </div>
                       <div class="col-sm-6">
                         <label for="eventoImpacto" class="form-label">Impacto no custo</label>
                         <select id="eventoImpacto" name="impacto" class="form-select" required>
@@ -335,7 +286,6 @@
                       <thead class="table-light">
                         <tr>
                           <th>Título</th>
-                          <th>Municípios</th>
                           <th>Impacto</th>
                           <th>Período</th>
                           <th class="text-end">Ações</th>
@@ -345,34 +295,17 @@
                         <c:choose>
                           <c:when test="${empty eventosExternos}">
                             <tr>
-                              <td colspan="5" class="text-center text-muted py-4">Nenhum evento cadastrado até o momento.</td>
+                              <td colspan="4" class="text-center text-muted py-4">Nenhum evento cadastrado até o momento.</td>
                             </tr>
                           </c:when>
                           <c:otherwise>
                             <c:forEach items="${eventosExternos}" var="evento">
-                              <c:set var="municipiosAttr" value="${not empty evento.municipiosConcatenados ? evento.municipiosConcatenados : ''}" />
                               <tr>
                                 <td>
                                   <div class="fw-semibold">${evento.titulo}</div>
                                   <c:if test="${not empty evento.descricao}">
                                     <div class="small text-muted">${evento.descricao}</div>
                                   </c:if>
-                                </td>
-                                <td>
-                                  <c:choose>
-                                    <c:when test="${not empty evento.municipios}">
-                                      <div class="municipios-box">
-                                        <select class="form-select form-select-sm" multiple size="4" disabled aria-label="Municípios impactados">
-                                          <c:forEach items="${evento.municipios}" var="mun">
-                                            <option class="text-break">${mun}</option>
-                                          </c:forEach>
-                                        </select>
-                                      </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                      <span class="text-muted">—</span>
-                                    </c:otherwise>
-                                  </c:choose>
                                 </td>
                                 <td>
                                   <c:choose>
@@ -402,7 +335,6 @@
                                             data-evento-descricao="${fn:escapeXml(evento.descricao)}"
                                             data-evento-inicio="${evento.dataInicio}"
                                             data-evento-fim="${evento.dataFim}"
-                                            data-evento-municipios="${fn:escapeXml(municipiosAttr)}"
                                             data-evento-impacto="${evento.impacto}"
                                             data-evento-url="<c:url value='/dados/eventos/${evento.id}/atualizar'/>">
                                       Editar
@@ -595,15 +527,6 @@
               <div class="col-12">
                 <label for="editarTitulo" class="form-label">Título</label>
                 <input type="text" id="editarTitulo" name="titulo" class="form-control" maxlength="150" required />
-              </div>
-              <div class="col-12">
-                <label for="editarMunicipios" class="form-label">Municípios impactados</label>
-                <select id="editarMunicipios" name="municipios" class="form-select" multiple size="6" required>
-                  <c:forEach items="${municipiosEventos}" var="mun">
-                    <option value="${fn:escapeXml(mun)}">${mun}</option>
-                  </c:forEach>
-                </select>
-                <div class="form-text">Selecione todos os municípios afetados antes de salvar.</div>
               </div>
               <div class="col-sm-6">
                 <label for="editarImpacto" class="form-label">Impacto no custo</label>

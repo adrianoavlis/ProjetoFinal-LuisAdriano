@@ -2891,13 +2891,6 @@
   const formEditar = document.getElementById('formEditarEvento');
   const formNovo = document.getElementById('formNovoEvento');
 
-  function parseMunicipios(valor){
-    if (!valor) return [];
-    return valor.split(':::')
-      .map(function(item){ return item ? item.trim() : ''; })
-      .filter(function(item){ return item.length > 0; });
-  }
-
   function configurarValidacaoDatas(form, inicioSelector, fimSelector){
     if (!form) return;
     const inicio = form.querySelector(inicioSelector);
@@ -2923,59 +2916,8 @@
     });
   }
 
-  function configurarValidacaoMunicipios(form, selector){
-    if (!form) return;
-    const select = form.querySelector(selector);
-    if (!select) return;
-
-    function validar(){
-      select.setCustomValidity('');
-      const selecionados = Array.from(select.selectedOptions || [])
-        .map(function(opt){ return opt.value && opt.value.trim(); })
-        .filter(Boolean);
-      if (!selecionados.length){
-        select.setCustomValidity('Selecione ao menos um município.');
-      }
-    }
-
-    select.addEventListener('change', validar);
-    form.addEventListener('submit', function(event){
-      validar();
-      if (!form.checkValidity()){
-        event.preventDefault();
-        form.reportValidity();
-      }
-    });
-  }
-
-  function setSelectMultiplo(select, valores){
-    if (!select) return;
-    const lista = Array.isArray(valores) ? valores.map(function(v){ return v != null ? String(v).trim() : ''; }).filter(Boolean) : [];
-    const valoresSet = new Set(lista);
-    const opcoes = Array.from(select.options || []);
-
-    valoresSet.forEach(function(valor){
-      let opcao = opcoes.find(function(opt){ return opt.value === valor; });
-      if (!opcao){
-        opcao = new Option(valor, valor, false, true);
-        select.appendChild(opcao);
-        opcoes.push(opcao);
-      } else {
-        opcao.selected = true;
-      }
-    });
-
-    opcoes.forEach(function(opt){
-      if (!valoresSet.has(opt.value)){
-        opt.selected = false;
-      }
-    });
-  }
-
   configurarValidacaoDatas(formNovo, '#eventoDataInicio', '#eventoDataFim');
   configurarValidacaoDatas(formEditar, '#editarDataInicio', '#editarDataFim');
-  configurarValidacaoMunicipios(formNovo, '#eventoMunicipios');
-  configurarValidacaoMunicipios(formEditar, '#editarMunicipios');
 
   if (!modal || !formEditar) {
     return;
@@ -2989,7 +2931,6 @@
     const descricao = button.getAttribute('data-evento-descricao') || '';
     const inicio = button.getAttribute('data-evento-inicio') || '';
     const fim = button.getAttribute('data-evento-fim') || '';
-    const municipios = parseMunicipios(button.getAttribute('data-evento-municipios'));
     const impacto = button.getAttribute('data-evento-impacto') || '';
     const actionUrl = button.getAttribute('data-evento-url');
 
@@ -3002,7 +2943,6 @@
     formEditar.querySelector('#editarDescricao').value = descricao;
     formEditar.querySelector('#editarDataInicio').value = inicio;
     formEditar.querySelector('#editarDataFim').value = fim;
-    setSelectMultiplo(formEditar.querySelector('#editarMunicipios'), municipios);
     const selectImpacto = formEditar.querySelector('#editarImpacto');
     if (selectImpacto) {
       selectImpacto.value = impacto;
@@ -3012,10 +2952,6 @@
   modal.addEventListener('hidden.bs.modal', function(){
     formEditar.reset();
     formEditar.action = '';
-    const selectMunicipios = formEditar.querySelector('#editarMunicipios');
-    if (selectMunicipios) {
-      Array.from(selectMunicipios.options || []).forEach(function(opt){ opt.selected = false; });
-    }
   });
 })();
 
@@ -4743,16 +4679,9 @@ function desenharGraficosPeso(componentes){
 async function buildEventos(filtro){
   var periodo = filtro ? filtro.periodo : null;
   var limites = obterLimitesPeriodo(periodo);
-  var municipiosSelecionados = obterMunicipiosDoFiltro(filtro, 4);
-  var municipiosSelecionadosSet = new Set(
-    municipiosSelecionados
-      .map(function(id){ return String(id || '').trim().toUpperCase(); })
-      .filter(function(id){ return !!id; })
-  );
 
   if (EVENTOS_EXTERNOS_URL) {
     var params = new URLSearchParams();
-    municipiosSelecionados.forEach(function(id){ params.append('municipios', id); });
     if (limites.inicioInfo) {
       params.set('inicio', construirDataIso(limites.inicioInfo.ano, limites.inicioInfo.mes, 1));
     }
@@ -4776,31 +4705,6 @@ async function buildEventos(filtro){
   }
 
   eventosExternosCache = Array.isArray(eventosExternosBase) ? eventosExternosBase.slice() : [];
-  if (municipiosSelecionadosSet.size) {
-    eventosExternosCache = eventosExternosCache.filter(function(ev){
-      var municipiosEvento = [];
-      if (Array.isArray(ev.municipiosId) && ev.municipiosId.length) {
-        municipiosEvento = ev.municipiosId;
-      } else if (Array.isArray(ev.municipios) && ev.municipios.length) {
-        municipiosEvento = ev.municipios.map(function(item){
-          if (item && typeof item === 'object') {
-            return item.id || item.nome || item;
-          }
-          return item;
-        });
-      }
-
-      var municipiosNormalizados = municipiosEvento
-        .map(function(id){ return String(id || '').trim().toUpperCase(); })
-        .filter(function(id){ return !!id; });
-
-      if (!municipiosNormalizados.length) {
-        return false;
-      }
-
-      return municipiosNormalizados.some(function(id){ return municipiosSelecionadosSet.has(id); });
-    });
-  }
   eventosExternosCache.sort(compararEventosPorPeriodo);
 
   var serieFiltrada = filtrarSeriePorPeriodo(evolucaoHistorica, periodo);
@@ -4868,11 +4772,7 @@ async function buildEventos(filtro){
     var tooltipInfo = {
       titulo: titulo,
       impacto: rotuloImpacto(ev.impacto),
-      valor: typeof ev.valorMedioCesta === 'number' ? brl(ev.valorMedioCesta) : '—',
       descricao: ev.descricao || ev.comentario || '',
-      municipios: Array.isArray(ev.municipios)
-        ? ev.municipios.filter(function(m){ return m && m.trim(); }).join(', ')
-        : (ev.municipio || ''),
       fonte: ev.fonte || ev.origem || '',
       link: ev.link || ev.url || ''
     };
@@ -4906,9 +4806,8 @@ async function buildEventos(filtro){
         return '';
       }
       return eventos.map(function(info){
-        var partes = [info.titulo + ' • ' + info.impacto + ' • ' + info.valor];
+        var partes = [info.titulo + ' • ' + info.impacto];
         var detalhes = [];
-        if (info.municipios) detalhes.push('Municípios: ' + info.municipios);
         if (info.descricao) detalhes.push(info.descricao);
         if (info.fonte) detalhes.push('Fonte: ' + info.fonte);
         if (info.link) detalhes.push('Mais informações: ' + info.link);
@@ -5011,29 +4910,17 @@ async function buildEventos(filtro){
       var html = '';
       eventosVisiveis.forEach(function(ev){
         var periodoTexto = formatarPeriodoEvento(ev);
-        var municipiosLista = Array.isArray(ev.municipios)
-          ? ev.municipios.filter(function(m){ return m && m.trim(); })
-          : [];
-        if (!municipiosLista.length && ev.municipio) {
-          municipiosLista.push(ev.municipio);
-        }
-        var municipioTexto = municipiosLista.join(', ');
-        var valorTexto = typeof ev.valorMedioCesta === 'number' ? brl(ev.valorMedioCesta) : '—';
         var descricao = ev.descricao || ev.comentario || '';
         var impactoRotulo = rotuloImpacto(ev.impacto);
         var impactoCores = obterCoresImpacto(ev.impacto);
         html += '<li class="d-flex justify-content-between align-items-start flex-wrap gap-2">';
         html += '<div class="me-2">';
         html += '<strong>' + periodoTexto + ' – ' + (ev.titulo || ev.rotulo || 'Evento') + '</strong>';
-        if (municipioTexto) {
-          html += '<div class="small text-secondary">' + municipioTexto + '</div>';
-        }
         html += '<div class="small"><span class="badge ' + impactoCores.badge + '">' + impactoRotulo + '</span></div>';
         if (descricao) {
           html += '<div class="small text-muted">' + descricao + '</div>';
         }
         html += '</div>';
-        html += '<span class="badge text-bg-light">' + valorTexto + '</span>';
         html += '</li>';
       });
       ul.innerHTML = html;
