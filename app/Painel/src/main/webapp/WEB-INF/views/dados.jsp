@@ -364,10 +364,7 @@
                                       <div class="municipios-box">
                                         <ul class="list-unstyled mb-0 small">
                                           <c:forEach items="${evento.municipios}" var="mun">
-                                            <li class="d-flex align-items-start gap-1">
-                                              <span class="text-primary-emphasis">•</span>
-                                              <span class="text-break">${mun}</span>
-                                            </li>
+                                            <li class="text-break">${mun}</li>
                                           </c:forEach>
                                         </ul>
                                       </div>
@@ -393,7 +390,6 @@
                                 <td>
                                   <span class="badge text-bg-light">${evento.periodoInicio}</span>
                                   <c:if test="${not empty evento.periodoFim && evento.periodoFim != evento.periodoInicio}">
-                                    <span class="material-symbols-outlined align-middle text-muted" style="font-size: 1rem;">trending_flat</span>
                                     <span class="badge text-bg-light">${evento.periodoFim}</span>
                                   </c:if>
                                 </td>
