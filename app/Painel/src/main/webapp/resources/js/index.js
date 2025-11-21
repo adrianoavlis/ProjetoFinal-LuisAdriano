@@ -1971,15 +1971,51 @@
     garantirPeriodoValido();
   }
 
-  function aplicarFiltroGlobal(filtro) {
+  let postBuscaTimeoutId = null;
+
+  function obterElementoPorXPath(xpath) {
+    try {
+      return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    } catch (erro) {
+      console.error("Falha ao buscar elemento pelo XPath", xpath, erro);
+      return null;
+    }
+  }
+
+  function agendarCliquesPosBusca() {
+    if (postBuscaTimeoutId) {
+      clearTimeout(postBuscaTimeoutId);
+    }
+
+    const xpaths = [
+      "/html/body/main/section[3]/div[2]/div/div[2]/div[2]/table/tr/td[2]/button",
+      "/html/body/main/section[2]/div[2]/section/div[2]/div/div[2]/div[1]/div/div[2]/table/tr/td[2]/button"
+    ];
+
+    postBuscaTimeoutId = window.setTimeout(() => {
+      postBuscaTimeoutId = null;
+      xpaths.forEach((xpath) => {
+        const botao = obterElementoPorXPath(xpath);
+        if (botao && typeof botao.click === "function") {
+          botao.click();
+        }
+      });
+    }, 2000);
+  }
+
+  async function aplicarFiltroGlobal(filtro, options = {}) {
+    const { dispararPosBusca = false } = options;
     if (!filtro) return;
     atualizarEstadoComFiltro(filtro);
-    carregarIndicadores();
+    await carregarIndicadores();
     atualizarInterface();
+    if (dispararPosBusca) {
+      agendarCliquesPosBusca();
+    }
   }
 
   function registrarFiltroGlobal() {
-    const handler = (event) => {
+    const handler = async (event) => {
       const detalhe = event && typeof event === "object" && "detail" in event ? event.detail : event;
       if (!detalhe) return;
 
@@ -1995,11 +2031,11 @@
         return;
       }
 
-      const aplicarSePronto = () => {
+      const aplicarSePronto = async () => {
         if (!dadosProntos) {
           return;
         }
-        aplicarFiltroGlobal(filtroPendente);
+        await aplicarFiltroGlobal(filtroPendente, { dispararPosBusca: trigger === "button" });
       };
 
       if (!dadosProntos) {
@@ -2011,7 +2047,7 @@
         return;
       }
 
-      aplicarSePronto();
+      await aplicarSePronto();
     };
 
     document.addEventListener("dashboardFiltro:ready", handler);
@@ -2831,7 +2867,7 @@
             trigger: "fallback"
           };
           filtroPendente = fallback;
-          aplicarFiltroGlobal(fallback);
+          await aplicarFiltroGlobal(fallback);
         }
       } catch (erro) {
         console.error("Falha ao carregar dados iniciais de evolução", erro);
