@@ -57,6 +57,23 @@
       min-height: calc(100vh - 88px);
       padding-bottom: 2rem;
     }
+
+    .municipios-box {
+      max-height: 140px;
+      overflow: auto;
+      padding: 0.5rem 0.75rem;
+      background-color: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+    }
+
+    .municipios-box ul {
+      margin-bottom: 0;
+    }
+
+    .municipios-box li + li {
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 <body id="topo" class="bg-light">
@@ -321,7 +338,6 @@
                           <th>Municípios</th>
                           <th>Impacto</th>
                           <th>Período</th>
-                          <th class="text-end">Cesta média</th>
                           <th class="text-end">Ações</th>
                         </tr>
                       </thead>
@@ -329,7 +345,7 @@
                         <c:choose>
                           <c:when test="${empty eventosExternos}">
                             <tr>
-                              <td colspan="6" class="text-center text-muted py-4">Nenhum evento cadastrado até o momento.</td>
+                              <td colspan="5" class="text-center text-muted py-4">Nenhum evento cadastrado até o momento.</td>
                             </tr>
                           </c:when>
                           <c:otherwise>
@@ -345,10 +361,15 @@
                                 <td>
                                   <c:choose>
                                     <c:when test="${not empty evento.municipios}">
-                                      <div class="d-flex flex-wrap gap-1">
-                                        <c:forEach items="${evento.municipios}" var="mun">
-                                          <span class="badge bg-primary-subtle text-primary">${mun}</span>
-                                        </c:forEach>
+                                      <div class="municipios-box">
+                                        <ul class="list-unstyled mb-0 small">
+                                          <c:forEach items="${evento.municipios}" var="mun">
+                                            <li class="d-flex align-items-start gap-1">
+                                              <span class="text-primary-emphasis">•</span>
+                                              <span class="text-break">${mun}</span>
+                                            </li>
+                                          </c:forEach>
+                                        </ul>
                                       </div>
                                     </c:when>
                                     <c:otherwise>
@@ -375,18 +396,6 @@
                                     <span class="material-symbols-outlined align-middle text-muted" style="font-size: 1rem;">trending_flat</span>
                                     <span class="badge text-bg-light">${evento.periodoFim}</span>
                                   </c:if>
-                                </td>
-                                <td class="text-end">
-                                  <c:choose>
-                                    <c:when test="${not empty evento.valorMedioCesta}">
-                                      <jsp:include page="/WEB-INF/views/fragments/numero.jsp">
-                                        <jsp:param name="valor" value="${evento.valorMedioCesta}" />
-                                      </jsp:include>
-                                    </c:when>
-                                    <c:otherwise>
-                                      <span class="text-muted">—</span>
-                                    </c:otherwise>
-                                  </c:choose>
                                 </td>
                                 <td class="text-end">
                                   <div class="btn-group btn-group-sm" role="group">
