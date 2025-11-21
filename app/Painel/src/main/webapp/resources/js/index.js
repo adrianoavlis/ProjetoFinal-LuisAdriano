@@ -5025,10 +5025,10 @@ async function initDashboard(){
   }
 
   const aplicarAtualizacaoFiltro = function(filtro){
-    if (!filtro || filtro.trigger !== 'button') {
-      return;
-    }
-    atualizarSecoesComFiltro(filtro).catch(function(err){
+    const payload = filtro || (window.DashboardFilter && typeof window.DashboardFilter.getState === 'function'
+      ? window.DashboardFilter.getState()
+      : null);
+    atualizarSecoesComFiltro(payload).catch(function(err){
       console.error('Falha ao atualizar o painel com os filtros selecionados', err);
     });
   };
@@ -5038,6 +5038,13 @@ async function initDashboard(){
       window.DashboardFilter.subscribe(aplicarAtualizacaoFiltro);
     }
   }
+
+  const filtroInicial = window.DashboardFilter && typeof window.DashboardFilter.getState === 'function'
+    ? window.DashboardFilter.getState()
+    : null;
+
+  await garantirDadosIniciais();
+  await atualizarSecoesComFiltro(filtroInicial);
 }
 
 const bootstrapDashboardWhenAnychartReady = (maxRetries = 50, delayMs = 100) => {
