@@ -5025,7 +5025,7 @@ async function initDashboard(){
   }
 
   const aplicarAtualizacaoFiltro = function(filtro){
-    if (!filtro) {
+    if (!filtro || filtro.trigger !== 'button') {
       return;
     }
     atualizarSecoesComFiltro(filtro).catch(function(err){
@@ -5036,12 +5036,6 @@ async function initDashboard(){
   if (window.DashboardFilter) {
     if (typeof window.DashboardFilter.subscribe === 'function'){
       window.DashboardFilter.subscribe(aplicarAtualizacaoFiltro);
-    }
-    if (typeof window.DashboardFilter.getState === 'function') {
-      var estadoInicial = window.DashboardFilter.getState();
-      if (estadoInicial) {
-        aplicarAtualizacaoFiltro(estadoInicial);
-      }
     }
   }
 }
