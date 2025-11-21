@@ -7,6 +7,7 @@ import br.com.shop2.model.common.Municipios;
 import br.com.shop2.model.evento.EventoExterno;
 import br.com.shop2.model.evento.EventoExternoDetalheDTO;
 import br.com.shop2.model.evento.EventoExternoForm;
+import br.com.shop2.model.evento.EventoExternoMunicipio;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,9 +59,9 @@ public class EventoExternoService {
             .descricao(sanitizarDescricao(form.getDescricao()))
             .dataInicio(form.getDataInicio())
             .dataFim(form.getDataFim())
-            .municipios(new ArrayList<>(municipios))
             .impacto(Objects.requireNonNull(form.getImpacto(), "Informe o impacto do evento."))
             .build();
+        atualizarMunicipios(entidade, municipios);
         eventoExternoRepository.save(entidade);
     }
 
@@ -78,8 +79,8 @@ public class EventoExternoService {
         existente.setDescricao(sanitizarDescricao(form.getDescricao()));
         existente.setDataInicio(form.getDataInicio());
         existente.setDataFim(form.getDataFim());
-        existente.setMunicipios(new ArrayList<>(municipios));
         existente.setImpacto(Objects.requireNonNull(form.getImpacto(), "Informe o impacto do evento."));
+        atualizarMunicipios(existente, municipios);
 
         eventoExternoRepository.save(existente);
     }
@@ -116,8 +117,7 @@ public class EventoExternoService {
 
     public Set<Municipios> listarMunicipiosDisponiveis() {
         return eventoExternoRepository.findAll().stream()
-            .map(EventoExterno::getMunicipios)
-            .filter(Objects::nonNull)
+            .map(this::extrairMunicipios)
             .flatMap(Collection::stream)
             .filter(Objects::nonNull)
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Municipios::getNome))));
@@ -155,9 +155,7 @@ public class EventoExternoService {
         YearMonth periodoFim = fim != null ? YearMonth.from(fim) : null;
 
         BigDecimal valorMedio = calcularValorMedioCesta(evento, periodoInicio, periodoFim);
-        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
-            .filter(Objects::nonNull)
-            .toList();
+        List<Municipios> municipiosEvento = extrairMunicipios(evento);
         List<String> municipiosNomes = municipiosEvento.stream()
             .map(Municipios::getNome)
             .toList();
@@ -191,9 +189,7 @@ public class EventoExternoService {
             return null;
         }
 
-        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
-            .filter(Objects::nonNull)
-            .toList();
+        List<Municipios> municipiosEvento = extrairMunicipios(evento);
         if (municipiosEvento.isEmpty()) {
             return null;
         }
@@ -266,7 +262,7 @@ public class EventoExternoService {
         if (municipiosNormalizados == null || municipiosNormalizados.isEmpty()) {
             return true;
         }
-        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of());
+        List<Municipios> municipiosEvento = extrairMunicipios(evento);
         return municipiosEvento.stream()
             .filter(Objects::nonNull)
             .anyMatch(municipiosNormalizados::contains);
@@ -286,5 +282,31 @@ public class EventoExternoService {
         }
         String texto = descricao.trim();
         return texto.isEmpty() ? null : texto;
+    }
+
+    private void atualizarMunicipios(EventoExterno evento, List<Municipios> municipios) {
+        List<EventoExternoMunicipio> novos = Optional.ofNullable(municipios).orElse(List.of()).stream()
+            .filter(Objects::nonNull)
+            .distinct()
+            .map(municipio -> EventoExternoMunicipio.builder()
+                .eventoExterno(evento)
+                .municipio(municipio)
+                .build())
+            .toList();
+
+        List<EventoExternoMunicipio> existentes = Optional.ofNullable(evento.getMunicipios()).orElseGet(ArrayList::new);
+        existentes.clear();
+        existentes.addAll(novos);
+        evento.setMunicipios(existentes);
+    }
+
+    private List<Municipios> extrairMunicipios(EventoExterno evento) {
+        return Optional.ofNullable(evento)
+            .map(EventoExterno::getMunicipios)
+            .orElse(List.of())
+            .stream()
+            .map(EventoExternoMunicipio::getMunicipio)
+            .filter(Objects::nonNull)
+            .toList();
     }
 }
