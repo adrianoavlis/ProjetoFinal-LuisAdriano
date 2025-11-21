@@ -34,10 +34,10 @@
         </button>
         <div class="collapse navbar-collapse justify-content-lg-end" id="mainNav">
           <ul class="navbar-nav align-items-lg-center gap-lg-2 ms-lg-4">
-            <li class="nav-item"><a class="nav-link active" href="#tab-evolucao" data-tab-target="tab-evolucao">Evolução</a></li>
-            <li class="nav-item"><a class="nav-link" href="#tab-regional" data-tab-target="tab-regional">Comparativo regional</a></li>
-            <li class="nav-item"><a class="nav-link" href="#tab-peso" data-tab-target="tab-peso">Peso dos itens</a></li>
-            <li class="nav-item"><a class="nav-link" href="#tab-eventos" data-tab-target="tab-eventos">Eventos externos</a></li>
+            <li class="nav-item"><a class="nav-link active" href="#tab-evolucao" data-tab-target="tab-evolucao">Evolução Anual</a></li>
+            <li class="nav-item"><a class="nav-link" href="#tab-regional" data-tab-target="tab-regional">Comparativo Regional</a></li>
+            <li class="nav-item"><a class="nav-link" href="#tab-peso" data-tab-target="tab-peso">Peso dos Itens</a></li>
+            <li class="nav-item"><a class="nav-link" href="#tab-eventos" data-tab-target="tab-eventos">Eventos Externos</a></li>
             <li class="nav-item mt-2 mt-lg-0">
               <a class="btn btn-outline-primary w-100" href="<c:url value='/dados'/>">Dados</a>
             </li>
@@ -58,7 +58,7 @@
             </div>
             <div>
               <h2 class="h6 mb-0">Personalize a análise</h2>
-              <small class="text-muted">Escolha municípios, período e modo de variação para sincronizar todo o painel.</small>
+              <small class="text-muted">Escolha municípios, período e modo de variação para sincronizar o painel.</small>
             </div>
           </div>
 
@@ -67,7 +67,7 @@
               <div class="filter-group h-100">
                 <div class="filter-group__header">
                   <span class="filter-group__label">Municípios</span>
-                  <small class="filter-group__helper">Escolha um ou mais municípios para comparar</small>
+                  <small class="filter-group__helper">Escolha um ou mais municípios para analisar</small>
                 </div>
                 <div class="filter-group__body">
                   <div class="filter-scroll" role="presentation">
@@ -127,24 +127,16 @@
     </section>
 
     <!-- Seções principais -->
-
+      <!-- EVOLUÇÃO -->
       <div class="functional-divider" aria-labelledby="divider-evolucao">
         <div class="functional-divider__line" aria-hidden="true"></div>
         <div class="functional-divider__content">
-          <h2 id="divider-evolucao" class="functional-divider__title">Acompanhar a mudança dos preços</h2>
-          <p class="functional-divider__subtitle">Nesta parte você vê, mês a mês, quanto custa a cesta básica em cada cidade e se o valor subiu ou desceu.</p>
+          <h2 id="divider-evolucao" class="functional-divider__title">Evolução de Preços Anualmente</h2>
+          <p class="functional-divider__subtitle"> Mapa interativo, indicadores dinâmicos e histórico detalhado diretamente no painel principal.</p>
         </div>
       </div>
 
-      <!-- EVOLUÇÃO -->
-      <section id="tab-evolucao" class="mb-5">
-        <div class="mb-4 text-center text-lg-start">
-          <h2 class="h4 mb-1">Evolução de preços • Monitor inteligente</h2>
-          <p class="text-muted small mb-0">
-            Mapa interativo, indicadores dinâmicos e histórico detalhado diretamente no painel principal.
-          </p>
-        </div>
-
+      
         <div class="row g-4 align-items-start">
           <section class="col-12">
             <div id="indicadores" class="row g-3">
@@ -252,7 +244,7 @@
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                   <div>
                     <h3 class="h6 mb-0">Histórico de preços</h3>
-                    <small class="text-muted">Gráfico de área moderno com comparação entre municípios selecionados. Linhas pontilhadas indicam a média do período filtrado.</small>
+                    <small class="text-muted">Gráfico de área comparando os municípios selecionados. Linhas pontilhadas indicam a média do período filtrado.</small>
                   </div>
                   <span id="periodoSelecionado" class="badge rounded-pill text-bg-light">—</span>
                 </div>
@@ -268,7 +260,7 @@
       <div class="functional-divider" aria-labelledby="divider-regional">
         <div class="functional-divider__line" aria-hidden="true"></div>
         <div class="functional-divider__content">
-          <h2 id="divider-regional" class="functional-divider__title">Comparar cidades de forma fácil</h2>
+          <h2 id="divider-regional" class="functional-divider__title">Comparar cidades</h2>
           <p class="functional-divider__subtitle">Aqui você escolhe cidades para comparar. O painel mostra quem está com o preço mais barato e quem está mais caro agora.</p>
         </div>
       </div>
@@ -297,12 +289,10 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
               <div>
                 <h3 class="h6 mb-0">Mapa interativo por município</h3>
-                <small class="text-muted">Visualização com Leaflet e camadas OpenStreetMap.</small>
+                <p id="mapMunicipioInfo" class="small text-muted mt-2 mb-0">Clique em um município para ver o custo mais recente da cesta básica.</p>
               </div>
-              <button id="mapRegionalReset" class="btn btn-outline-primary btn-sm" type="button">Centralizar mapa</button>
             </div>
             <div id="mapMunicipios" class="map-wrap border rounded"></div>
-            <p id="mapMunicipioInfo" class="small text-muted mt-2 mb-0">Clique em um município para ver o custo mais recente da cesta básica.</p>
           </div>
         </div>
 
@@ -351,8 +341,8 @@
       <div class="functional-divider" aria-labelledby="divider-peso">
         <div class="functional-divider__line" aria-hidden="true"></div>
         <div class="functional-divider__content">
-          <h2 id="divider-peso" class="functional-divider__title">Descobrir os itens que pesam no bolso</h2>
-          <p class="functional-divider__subtitle">Aqui você descobre quais produtos da cesta pesam mais no seu bolso neste mês.</p>
+          <h2 id="divider-peso" class="functional-divider__title">Itens que pesam na Cesta Básica</h2>
+          <p class="functional-divider__subtitle">Aqui você analisa a relevância dos itens no custo da Cesta e do último mês selecionado.</p>
         </div>
       </div>
 
@@ -394,7 +384,8 @@
         <div class="functional-divider__line" aria-hidden="true"></div>
         <div class="functional-divider__content">
           <h2 id="divider-eventos" class="functional-divider__title">Ver como fatos externos mudam os preços</h2>
-          <p class="functional-divider__subtitle">Aqui você simula acontecimentos, como clima ou dólar alto, para entender de jeito simples como isso pode mudar os preços.</p>
+          <p class="functional-divider__subtitle">Aqui você analisa como eventos nacionais e mundiais como: Crises Climáticas, 
+            Crises Econômicas, Conflitos Geopolíticos, etc... Proporcinando uma análise simples relacionando os Eventos.</p>
         </div>
       </div>
 
@@ -403,7 +394,7 @@
         <div class="card shadow-sm">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <h2 class="h6 mb-0">Linha do tempo com eventos externos</h2>
+              <h2 class="h6 mb-0">Linha do tempo com Eventos Externos</h2>
             </div>
             <div class="chart-wrap"><div id="chEventos"></div></div>
             <ul id="listaEventos" class="mt-3 small"></ul>
