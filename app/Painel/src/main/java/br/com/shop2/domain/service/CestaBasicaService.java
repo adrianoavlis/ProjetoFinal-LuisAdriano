@@ -9,6 +9,7 @@ import br.com.shop2.model.common.EvolucaoIndicadoresDTO;
 import br.com.shop2.model.common.EvolucaoMunicipioDTO;
 import br.com.shop2.model.common.EvolucaoTendenciaDTO;
 import br.com.shop2.model.common.EvolucaoVariacaoDTO;
+import br.com.shop2.model.common.Municipios;
 import br.com.shop2.model.common.PeriodosDisponiveisDTO;
 import br.com.shop2.model.dados.GastoMensal;
 import br.com.shop2.model.mercado.CestaBasica;
@@ -362,6 +363,25 @@ public class CestaBasicaService {
 
     public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(Collection<String> municipios) {
         return serieHistoricaPorMunicipio(construirFiltro(municipios));
+    }
+
+    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(Collection<Municipios> municipios,
+                                                                         String mesInicio,
+                                                                         String mesFim,
+                                                                         Integer anoReferencia) {
+        Set<String> nomes = municipios == null ? Set.of() : municipios.stream()
+            .filter(Objects::nonNull)
+            .map(Municipios::getNome)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        return serieHistoricaPorMunicipio(construirFiltro(nomes, mesInicio, mesFim, anoReferencia));
+    }
+
+    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(Collection<Municipios> municipios) {
+        Set<String> nomes = municipios == null ? Set.of() : municipios.stream()
+            .filter(Objects::nonNull)
+            .map(Municipios::getNome)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        return serieHistoricaPorMunicipio(construirFiltro(nomes));
     }
 
     public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(EvolucaoFiltro filtro) {
