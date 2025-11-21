@@ -21,9 +21,8 @@ public class EventosExternosRestController {
     private final EventoExternoService eventoExternoService;
 
     @GetMapping
-    public List<EventoExternoDetalheDTO> listar(@RequestParam(value = "municipios", required = false) Collection<String> municipios,
-                                                @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+    public List<EventoExternoDetalheDTO> listar(@RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
                                                 @RequestParam(value = "fim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
-        return eventoExternoService.buscarPorFiltro(municipios, inicio, fim);
+        return eventoExternoService.buscarPorFiltro(inicio, fim);
     }
 }
