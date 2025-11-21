@@ -404,10 +404,6 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h2 class="h6 mb-0">Linha do tempo com eventos externos</h2>
-              <div class="d-flex gap-2">
-                <button id="btnChoqueClima" class="btn btn-outline-secondary btn-sm" type="button">Simular choque climático</button>
-                <button id="btnChoqueCambio" class="btn btn-outline-secondary btn-sm" type="button">Simular alta do dólar</button>
-              </div>
             </div>
             <div class="chart-wrap"><div id="chEventos"></div></div>
             <ul id="listaEventos" class="mt-3 small"></ul>
