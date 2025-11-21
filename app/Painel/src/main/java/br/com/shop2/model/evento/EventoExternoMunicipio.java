@@ -2,6 +2,7 @@ package br.com.shop2.model.evento;
 
 import br.com.shop2.model.common.BaseEntity;
 import br.com.shop2.model.common.Municipios;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,6 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@AttributeOverride(name = "id", column = @Column(name = "evento_id"))
 public class EventoExternoMunicipio extends BaseEntity {
 
     @NotNull
