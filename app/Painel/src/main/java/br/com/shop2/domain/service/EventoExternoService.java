@@ -199,7 +199,7 @@ public class EventoExternoService {
         }
 
         List<CestaBasicaSerieMunicipioDTO> series = cestaBasicaService
-            .serieHistoricaPorMunicipio(municipiosEvento);
+            .serieHistoricaPorMunicipios(municipiosEvento);
 
         if (series == null || series.isEmpty()) {
             return null;

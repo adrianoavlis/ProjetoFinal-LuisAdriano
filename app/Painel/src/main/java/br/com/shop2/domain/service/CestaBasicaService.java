@@ -45,7 +45,7 @@ public class CestaBasicaService {
             .appendPattern("MMM-uuuu")
             .toFormatter(Locale.ENGLISH);
 
-    private static final Locale LOCALE_PT_BR = new Locale("pt", "BR");
+    private static final Locale LOCALE_PT_BR = Locale.of("pt", "BR");
 
     private static final DateTimeFormatter MES_LONGO_FORMATTER =
         new DateTimeFormatterBuilder()
@@ -63,7 +63,7 @@ public class CestaBasicaService {
         new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MM-uuuu").toFormatter(),
         new DateTimeFormatterBuilder().parseCaseInsensitive()
             .appendPattern("MMM/uuuu")
-            .toFormatter(new Locale("pt", "BR"))
+            .toFormatter(Locale.of("pt", "BR"))
             .withResolverStyle(ResolverStyle.LENIENT)
     );
 
@@ -365,10 +365,10 @@ public class CestaBasicaService {
         return serieHistoricaPorMunicipio(construirFiltro(municipios));
     }
 
-    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(Collection<Municipios> municipios,
-                                                                         String mesInicio,
-                                                                         String mesFim,
-                                                                         Integer anoReferencia) {
+    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipios(Collection<Municipios> municipios,
+                                                                          String mesInicio,
+                                                                          String mesFim,
+                                                                          Integer anoReferencia) {
         Set<String> nomes = municipios == null ? Set.of() : municipios.stream()
             .filter(Objects::nonNull)
             .map(Municipios::getNome)
@@ -376,7 +376,7 @@ public class CestaBasicaService {
         return serieHistoricaPorMunicipio(construirFiltro(nomes, mesInicio, mesFim, anoReferencia));
     }
 
-    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipio(Collection<Municipios> municipios) {
+    public List<CestaBasicaSerieMunicipioDTO> serieHistoricaPorMunicipios(Collection<Municipios> municipios) {
         Set<String> nomes = municipios == null ? Set.of() : municipios.stream()
             .filter(Objects::nonNull)
             .map(Municipios::getNome)
@@ -547,21 +547,33 @@ public class CestaBasicaService {
     }
 
     private EvolucaoFiltro construirFiltro(Collection<String> municipios) {
+        return EvolucaoFiltro.builder()
+            .municipios(normalizarMunicipios(municipios))
+            .build();
+    }
+
+    private EvolucaoFiltro construirFiltro(Collection<String> municipios, String mesInicio, String mesFim, Integer anoReferencia) {
+        return EvolucaoFiltro.builder()
+            .municipios(normalizarMunicipios(municipios))
+            .mesInicio(parseYearMonth(mesInicio))
+            .mesFim(parseYearMonth(mesFim))
+            .anoReferencia(anoReferencia)
+            .build();
+    }
+
+    private Set<String> normalizarMunicipios(Collection<String> municipios) {
         if (municipios == null || municipios.isEmpty()) {
-            return EvolucaoFiltro.builder().build();
+            return Set.of();
         }
-        Set<String> selecionados = municipios.stream()
+        return municipios.stream()
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(valor -> !valor.isEmpty())
             .collect(Collectors.toCollection(LinkedHashSet::new));
-        return EvolucaoFiltro.builder()
-            .municipios(selecionados)
-            .build();
     }
 
     private List<GastoMensal> buscarRegistros(YearMonth mesInicio, YearMonth mesFim, Integer anoReferencia) {
-        Specification<GastoMensal> spec = Specification.where(null);
+        Specification<GastoMensal> spec = null;
         if (mesInicio != null) {
             spec = spec == null
                 ? (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("mesAno"), mesInicio)

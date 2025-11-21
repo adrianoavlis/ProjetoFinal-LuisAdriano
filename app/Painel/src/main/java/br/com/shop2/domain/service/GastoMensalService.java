@@ -153,7 +153,7 @@ public class GastoMensalService {
     }
 
     public Page<GastoMensal> listar(String municipio, YearMonth mesAno, Pageable pageable) {
-        Specification<GastoMensal> spec = Specification.where(null);
+        Specification<GastoMensal> spec = null;
         if (municipio != null && !municipio.isBlank()) {
             String filtro = normalizarMunicipioFiltro(municipio);
             spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("municipio")), "%" + filtro + "%"));

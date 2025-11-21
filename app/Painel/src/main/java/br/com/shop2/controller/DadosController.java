@@ -1,6 +1,5 @@
 package br.com.shop2.controller;
 
-import br.com.shop2.domain.service.CestaBasicaService;
 import br.com.shop2.domain.service.EventoExternoService;
 import br.com.shop2.domain.service.GastoMensalService;
 import br.com.shop2.domain.service.GastoMensalService.ImportacaoResultado;
@@ -45,13 +44,12 @@ import org.springframework.validation.BindingResult;
 @RequiredArgsConstructor
 public class DadosController {
 
-    private static final DateTimeFormatter FORMATO_EXIBICAO = DateTimeFormatter.ofPattern("MM/yyyy", new Locale("pt", "BR"));
+    private static final DateTimeFormatter FORMATO_EXIBICAO = DateTimeFormatter.ofPattern("MM/yyyy", Locale.of("pt", "BR"));
     private static final YearMonth PERIODO_INICIAL = YearMonth.of(2000, 1);
     private static final YearMonth PERIODO_FINAL = YearMonth.of(2025, 12);
 
     private final GastoMensalService gastoMensalService;
     private final EventoExternoService eventoExternoService;
-    private final CestaBasicaService cestaBasicaService;
 
     @GetMapping
     public String telaDados(@RequestParam(value = "municipio", required = false) String municipio,

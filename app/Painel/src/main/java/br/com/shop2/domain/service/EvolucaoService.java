@@ -54,7 +54,7 @@ public class EvolucaoService {
 
     private final EvolucaoRepository evolucaoRepository;
 
-    private static final Locale LOCALE_PT_BR = new Locale("pt", "BR");
+    private static final Locale LOCALE_PT_BR = Locale.of("pt", "BR");
 
     private static final DateTimeFormatter FRONT_YEAR_MONTH_FORMATTER =
         new DateTimeFormatterBuilder()
@@ -81,7 +81,7 @@ public class EvolucaoService {
         new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MM-uuuu").toFormatter(),
         new DateTimeFormatterBuilder().parseCaseInsensitive()
             .appendPattern("MMM/uuuu")
-            .toFormatter(new Locale("pt", "BR"))
+            .toFormatter(Locale.of("pt", "BR"))
             .withResolverStyle(ResolverStyle.LENIENT)
     );
 
