@@ -2000,7 +2000,7 @@
           botao.click();
         }
       });
-    }, 2000);
+    }, 1000);
   }
 
   async function aplicarFiltroGlobal(filtro, options = {}) {
