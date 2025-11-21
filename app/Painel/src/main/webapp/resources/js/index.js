@@ -4714,11 +4714,15 @@ async function buildEventos(filtro){
   eventosExternosCache.sort(compararEventosPorPeriodo);
 
   var serieFiltrada = filtrarSeriePorPeriodo(evolucaoHistorica, periodo);
-  if (!serieFiltrada.length && evolucaoHistorica.length) {
-    serieFiltrada = evolucaoHistorica.slice();
-  }
-  if (!serieFiltrada.length && SERIE_HISTORICA_MOCK.length) {
-    serieFiltrada = SERIE_HISTORICA_MOCK.slice();
+  if (!serieFiltrada.length) {
+    if (wrapEventos) {
+      wrapEventos.classList.add('chart-wrap--empty');
+    }
+    if (chEventos && typeof chEventos.dispose === 'function') {
+      chEventos.dispose();
+      chEventos = null;
+    }
+    return;
   }
 
   var labelsIso = serieFiltrada.map(function(r){ return r.mes; });
@@ -4737,10 +4741,31 @@ async function buildEventos(filtro){
 
   var eventosPorIndice = chartLabels.map(function(){ return []; });
   var eventMarkers = [];
+  var firstKey = labelKeys.length ? labelKeys[0].key : null;
+  var lastKey = labelKeys.length ? labelKeys[labelKeys.length - 1].key : null;
+
+  var encontrarInicio = function(chave){
+    for (var i = 0; i < labelKeys.length; i++) {
+      if (labelKeys[i].key >= chave) {
+        return i;
+      }
+    }
+    return labelKeys.length - 1;
+  };
+
+  var encontrarFim = function(chave){
+    for (var j = labelKeys.length - 1; j >= 0; j--) {
+      if (labelKeys[j].key <= chave) {
+        return j;
+      }
+    }
+    return 0;
+  };
+
   eventosExternosCache.forEach(function(ev){
     var inicio = normalizarPeriodoChave(ev.periodoInicio || ev.dataInicio);
     var fim = normalizarPeriodoChave(ev.periodoFim || ev.periodoInicio || ev.dataFim) || inicio;
-    if (!inicio) {
+    if (!inicio || !firstKey || !lastKey) {
       return;
     }
     if (fim && fim < inicio) {
@@ -4748,17 +4773,15 @@ async function buildEventos(filtro){
       inicio = fim;
       fim = troca;
     }
-    var startIndex = labelKeys.findIndex(function(item){ return item.key === inicio; });
-    var endIndex = labelKeys.findIndex(function(item){ return item.key === (fim || inicio); });
-    if (startIndex === -1 && endIndex === -1) {
+
+    var inicioClamped = inicio < firstKey ? firstKey : inicio;
+    var fimClamped = fim && fim > lastKey ? lastKey : (fim || inicioClamped);
+    if (inicioClamped > lastKey || fimClamped < firstKey) {
       return;
     }
-    if (startIndex === -1) {
-      startIndex = endIndex;
-    }
-    if (endIndex === -1) {
-      endIndex = startIndex;
-    }
+
+    var startIndex = encontrarInicio(inicioClamped);
+    var endIndex = encontrarFim(fimClamped);
     if (startIndex > endIndex) {
       var invert = startIndex;
       startIndex = endIndex;
@@ -4767,9 +4790,6 @@ async function buildEventos(filtro){
 
     var startLabel = chartLabels[startIndex];
     var endLabel = chartLabels[endIndex];
-    if (!startLabel || !endLabel) {
-      return;
-    }
 
     var coresImpacto = obterCoresImpacto(ev.impacto);
     var cor = coresImpacto.cor;
