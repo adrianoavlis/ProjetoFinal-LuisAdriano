@@ -3064,7 +3064,6 @@ let ultimoFiltroRegional = [];
 let filtroDashboardAtual = null;
 
 let eventosExternosBase = [];
-let eventosExternosSimulados = [];
 let eventosExternosCache = [];
 let dadosIniciaisCarregados = false;
 
@@ -4771,14 +4770,12 @@ async function buildEventos(filtro){
     }
   }
 
-  eventosExternosCache = []
-    .concat(Array.isArray(eventosExternosBase) ? eventosExternosBase : [])
-    .concat(Array.isArray(eventosExternosSimulados) ? eventosExternosSimulados : []);
+  eventosExternosCache = Array.isArray(eventosExternosBase) ? eventosExternosBase.slice() : [];
   eventosExternosCache.sort(compararEventosPorPeriodo);
 
   var serieFiltrada = filtrarSeriePorPeriodo(evolucaoHistorica, periodo);
-  if (!serieFiltrada.length) {
-    serieFiltrada = evolucaoHistorica.length ? evolucaoHistorica.slice() : SERIE_HISTORICA_MOCK.slice();
+  if (!serieFiltrada.length && evolucaoHistorica.length) {
+    serieFiltrada = evolucaoHistorica.slice();
   }
 
   var labelsIso = serieFiltrada.map(function(r){ return r.mes; });
@@ -5012,56 +5009,6 @@ async function buildEventos(filtro){
       ul.innerHTML = html;
     }
   }
-}
-
-// Botões de simulação de eventos (impactos)
-var choqueClimaBtn = document.getElementById('btnChoqueClima');
-if (choqueClimaBtn) {
-  choqueClimaBtn.addEventListener('click', async function(){
-    if (!dadosIniciaisCarregados) {
-      return;
-    }
-    var idx = evolucaoHistorica.findIndex(function(x){return x.mes==='2025-08';});
-    if(idx>=0){
-      for(var i=idx; i<Math.min(idx+2, evolucaoHistorica.length); i++){
-        evolucaoHistorica[i].cesta = +(evolucaoHistorica[i].cesta * 1.03).toFixed(1);
-      }
-      eventosExternosSimulados.push({
-        titulo: 'Choque climático',
-        descricao: 'Impacto simulado +3% por 2m',
-        periodoInicio: '2025-08',
-        periodoFim: '2025-09',
-        valorMedioCesta: calcularValorMedioLocal('2025-08', '2025-09')
-      });
-      atualizarMesesFull();
-      buildRegional(filtroDashboardAtual);
-      await buildEventos(filtroDashboardAtual);
-    }
-  });
-}
-var choqueCambioBtn = document.getElementById('btnChoqueCambio');
-if (choqueCambioBtn) {
-  choqueCambioBtn.addEventListener('click', async function(){
-    if (!dadosIniciaisCarregados) {
-      return;
-    }
-    var idx = evolucaoHistorica.findIndex(function(x){return x.mes==='2025-05';});
-    if(idx>=0){
-      for(var i=idx; i<Math.min(idx+3, evolucaoHistorica.length); i++){
-        evolucaoHistorica[i].cesta = +(evolucaoHistorica[i].cesta * 1.02).toFixed(1);
-      }
-      eventosExternosSimulados.push({
-        titulo: 'Alta do dólar',
-        descricao: 'Impacto simulado +2% por 3m',
-        periodoInicio: '2025-05',
-        periodoFim: '2025-07',
-        valorMedioCesta: calcularValorMedioLocal('2025-05', '2025-07')
-      });
-      atualizarMesesFull();
-      buildRegional(filtroDashboardAtual);
-      await buildEventos(filtroDashboardAtual);
-    }
-  });
 }
 
 async function initDashboard(){
