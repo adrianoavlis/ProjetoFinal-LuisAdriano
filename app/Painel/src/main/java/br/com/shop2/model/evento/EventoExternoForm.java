@@ -1,5 +1,6 @@
 package br.com.shop2.model.evento;
 
+import br.com.shop2.model.common.Municipios;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -40,7 +40,7 @@ public class EventoExternoForm {
     private LocalDate dataFim;
 
     @Builder.Default
-    private List<String> municipios = new ArrayList<>();
+    private List<Municipios> municipios = new ArrayList<>();
 
     @NotNull(message = "Informe o impacto do evento.")
     private Impacto impacto;
@@ -58,15 +58,7 @@ public class EventoExternoForm {
         if (municipios == null || municipios.isEmpty()) {
             return false;
         }
-        List<String> normalizados = municipios.stream()
-            .map(valor -> valor != null ? valor.trim() : null)
-            .filter(Objects::nonNull)
-            .filter(valor -> !valor.isEmpty())
-            .collect(Collectors.toList());
-        if (normalizados.isEmpty()) {
-            return false;
-        }
-        return normalizados.stream().allMatch(valor -> valor.length() <= 180);
+        return municipios.stream().allMatch(Objects::nonNull);
     }
 
     public void setTitulo(String titulo) {
@@ -77,7 +69,7 @@ public class EventoExternoForm {
         this.descricao = descricao;
     }
 
-    public void setMunicipios(Collection<String> municipios) {
+    public void setMunicipios(Collection<Municipios> municipios) {
         this.municipios = municipios == null ? new ArrayList<>() : new ArrayList<>(municipios);
     }
 }

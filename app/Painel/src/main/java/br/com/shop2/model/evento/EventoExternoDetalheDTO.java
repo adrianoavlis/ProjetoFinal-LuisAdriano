@@ -1,5 +1,6 @@
 package br.com.shop2.model.evento;
 
+import br.com.shop2.model.common.Municipios;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,7 @@ public class EventoExternoDetalheDTO {
     private String descricao;
     private LocalDate dataInicio;
     private LocalDate dataFim;
-    private List<String> municipios;
+    private List<Municipios> municipios;
     private List<String> municipiosId;
     private String municipiosConcatenados;
     private Impacto impacto;

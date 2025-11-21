@@ -3,6 +3,7 @@ package br.com.shop2.domain.service;
 import br.com.shop2.domain.repository.EventoExternoRepository;
 import br.com.shop2.model.common.CestaBasicaSerieDTO;
 import br.com.shop2.model.common.CestaBasicaSerieMunicipioDTO;
+import br.com.shop2.model.common.Municipios;
 import br.com.shop2.model.evento.EventoExterno;
 import br.com.shop2.model.evento.EventoExternoDetalheDTO;
 import br.com.shop2.model.evento.EventoExternoForm;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +21,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -47,8 +48,8 @@ public class EventoExternoService {
 
     @Transactional
     public void criar(EventoExternoForm form) {
-        List<String> municipios = sanitizarMunicipios(form.getMunicipios());
-        if (municipios.isEmpty()) {
+        List<Municipios> municipios = form.getMunicipios();
+        if (municipios == null || municipios.isEmpty()) {
             throw new IllegalArgumentException("Informe ao menos um município impactado.");
         }
 
@@ -68,8 +69,8 @@ public class EventoExternoService {
         EventoExterno existente = eventoExternoRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Evento não encontrado para edição."));
 
-        List<String> municipios = sanitizarMunicipios(form.getMunicipios());
-        if (municipios.isEmpty()) {
+        List<Municipios> municipios = form.getMunicipios();
+        if (municipios == null || municipios.isEmpty()) {
             throw new IllegalArgumentException("Informe ao menos um município impactado.");
         }
 
@@ -99,7 +100,12 @@ public class EventoExternoService {
                                                          LocalDate dataInicio,
                                                          LocalDate dataFim) {
         List<EventoExterno> candidatos = eventoExternoRepository.buscarPorPeriodo(dataInicio, dataFim);
-        Set<String> municipiosNormalizados = normalizarMunicipios(municipios);
+        Set<Municipios> municipiosNormalizados = municipios == null ? Set.of()
+            : municipios.stream()
+            .map(Municipios::fromTexto)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
         List<EventoExterno> filtrados = candidatos.stream()
             .filter(evento -> filtraPorMunicipio(evento, municipiosNormalizados))
@@ -108,15 +114,13 @@ public class EventoExternoService {
         return converterParaDetalhe(filtrados, dataInicio, dataFim);
     }
 
-    public Set<String> listarMunicipiosDisponiveis() {
+    public Set<Municipios> listarMunicipiosDisponiveis() {
         return eventoExternoRepository.findAll().stream()
             .map(EventoExterno::getMunicipios)
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
-            .map(valor -> valor != null ? valor.trim() : null)
             .filter(Objects::nonNull)
-            .filter(valor -> !valor.isEmpty())
-            .collect(Collectors.toCollection(TreeSet::new));
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Municipios::getNome))));
     }
 
     private List<EventoExternoDetalheDTO> converterParaDetalhe(List<EventoExterno> eventos,
@@ -151,14 +155,14 @@ public class EventoExternoService {
         YearMonth periodoFim = fim != null ? YearMonth.from(fim) : null;
 
         BigDecimal valorMedio = calcularValorMedioCesta(evento, periodoInicio, periodoFim);
-        List<String> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
+        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
             .filter(Objects::nonNull)
-            .map(String::trim)
-            .filter(valor -> !valor.isEmpty())
+            .toList();
+        List<String> municipiosNomes = municipiosEvento.stream()
+            .map(Municipios::getNome)
             .toList();
         List<String> municipiosId = municipiosEvento.stream()
-            .map(this::normalizarMunicipio)
-            .filter(Objects::nonNull)
+            .map(Municipios::name)
             .toList();
 
         return EventoExternoDetalheDTO.builder()
@@ -169,7 +173,7 @@ public class EventoExternoService {
             .dataFim(evento.getDataFim())
             .municipios(municipiosEvento)
             .municipiosId(municipiosId)
-            .municipiosConcatenados(String.join(":::", municipiosEvento))
+            .municipiosConcatenados(String.join(":::", municipiosNomes))
             .impacto(evento.getImpacto())
             .valorMedioCesta(valorMedio)
             .periodoInicio(periodoInicio != null ? PERIODO_FORMATTER.format(periodoInicio) : null)
@@ -187,10 +191,8 @@ public class EventoExternoService {
             return null;
         }
 
-        List<String> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
+        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of()).stream()
             .filter(Objects::nonNull)
-            .map(String::trim)
-            .filter(valor -> !valor.isEmpty())
             .toList();
         if (municipiosEvento.isEmpty()) {
             return null;
@@ -203,17 +205,14 @@ public class EventoExternoService {
             return null;
         }
 
-        Set<String> municipiosNormalizados = municipiosEvento.stream()
-            .map(this::normalizarMunicipio)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+        Set<Municipios> municipiosNormalizados = new HashSet<>(municipiosEvento);
 
         List<Double> valores = new ArrayList<>();
         for (CestaBasicaSerieMunicipioDTO serieMunicipio : series) {
             if (serieMunicipio == null || serieMunicipio.getSerie() == null) {
                 continue;
             }
-            String municipioId = normalizarMunicipio(serieMunicipio.getMunicipio());
+            Municipios municipioId = Municipios.fromTexto(serieMunicipio.getMunicipio()).orElse(null);
             if (municipioId == null || !municipiosNormalizados.contains(municipioId)) {
                 continue;
             }
@@ -263,57 +262,14 @@ public class EventoExternoService {
         }
     }
 
-    private boolean filtraPorMunicipio(EventoExterno evento, Set<String> municipiosNormalizados) {
+    private boolean filtraPorMunicipio(EventoExterno evento, Set<Municipios> municipiosNormalizados) {
         if (municipiosNormalizados == null || municipiosNormalizados.isEmpty()) {
             return true;
         }
-        List<String> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of());
+        List<Municipios> municipiosEvento = Optional.ofNullable(evento.getMunicipios()).orElse(List.of());
         return municipiosEvento.stream()
-            .map(this::normalizarMunicipio)
             .filter(Objects::nonNull)
             .anyMatch(municipiosNormalizados::contains);
-    }
-
-    private Set<String> normalizarMunicipios(Collection<String> municipios) {
-        if (municipios == null) {
-            return Set.of();
-        }
-        return municipios.stream()
-            .filter(Objects::nonNull)
-            .map(this::normalizarMunicipio)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-    }
-
-    private String normalizarMunicipio(String valor) {
-        if (valor == null) {
-            return null;
-        }
-        String texto = valor.trim();
-        if (texto.isEmpty()) {
-            return null;
-        }
-        String semAcento = Normalizer.normalize(texto, Normalizer.Form.NFD)
-            .replaceAll("\\p{M}+", "");
-        return semAcento.toUpperCase(Locale.ROOT);
-    }
-
-    private List<String> sanitizarMunicipios(Collection<String> municipios) {
-        if (municipios == null) {
-            return List.of();
-        }
-        LinkedHashSet<String> valores = new LinkedHashSet<>();
-        for (String municipio : municipios) {
-            String texto = sanitizarTexto(municipio);
-            if (texto == null) {
-                continue;
-            }
-            if (texto.length() > 180) {
-                throw new IllegalArgumentException("O município deve ter no máximo 180 caracteres.");
-            }
-            valores.add(texto);
-        }
-        return new ArrayList<>(valores);
     }
 
     private String sanitizarTexto(String texto) {

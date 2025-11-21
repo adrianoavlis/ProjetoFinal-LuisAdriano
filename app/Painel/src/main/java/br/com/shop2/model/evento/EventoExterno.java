@@ -1,6 +1,7 @@
 package br.com.shop2.model.evento;
 
 import br.com.shop2.model.common.BaseEntity;
+import br.com.shop2.model.common.Municipios;
 import br.com.shop2.model.converter.MunicipiosListaConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -48,7 +49,7 @@ public class EventoExterno extends BaseEntity {
     @Convert(converter = MunicipiosListaConverter.class)
     @Column(name = "municipio", nullable = false, columnDefinition = "TEXT")
     @Builder.Default
-    private List<String> municipios = new ArrayList<>();
+    private List<Municipios> municipios = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)

@@ -4,6 +4,7 @@ import br.com.shop2.domain.service.CestaBasicaService;
 import br.com.shop2.domain.service.EventoExternoService;
 import br.com.shop2.domain.service.GastoMensalService;
 import br.com.shop2.domain.service.GastoMensalService.ImportacaoResultado;
+import br.com.shop2.model.common.Municipios;
 import br.com.shop2.model.dados.GastoMensal;
 import br.com.shop2.model.dados.ImportacaoResumoView;
 import br.com.shop2.model.dados.PeriodoImportacaoView;
@@ -83,7 +84,7 @@ public class DadosController {
         model.addAttribute("periodosImportados", formatarPeriodos(periodosImportados));
         model.addAttribute("linhaPeriodos", montarLinhaPeriodos(periodosImportados));
         model.addAttribute("eventosExternos", eventoExternoService.listarTodos());
-        model.addAttribute("municipiosEventos", cestaBasicaService.listarMunicipiosDisponiveis());
+        model.addAttribute("municipiosEventos", Municipios.values());
 
         return "dados";
     }
