@@ -18,7 +18,6 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 
 - **Evolução dos preços**
 - **Comparação regional**
-- **Impacto da inflação**
 - **Peso dos itens**
 - **Influência de eventos externos**
 
