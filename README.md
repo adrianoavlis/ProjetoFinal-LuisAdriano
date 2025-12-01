@@ -39,22 +39,19 @@ As análises, indicadores e visualizações foram fundamentados nos dados do DIE
 - **Banco de Dados:** Microsoft SQL Server  
 - **Versionamento:** Git e GitHub
 
-## 🧩 Diagrama da Arquitetura
-![Diagrama](Diagramas/Diagrama_de_arquitetura.pdf)
-
 ##  Painel Analítico da Cesta Básica
 
-![Evolução de Preços](ASSETS/docs/prototipos/Evolução.png)
+![Evolução de Preços](Prototipos/Evolução.png)
 
-![Evolução de Preços](ASSETS/docs/prototipos/Grafico_Evolucao.png)
+![Evolução de Preços](Prototipos/Grafico_Evolucao.png)
 
-![Comparativo Regional](ASSETS/docs/prototipos/Comparativo_Regional_.png)
+![Comparativo Regional](Prototipos/Comparativo_Regional_.png)
 
-![Comparativo Regional](ASSETS/docs/prototipos/Comparativo_Regional_2.png)
+![Comparativo Regional](Prototipos/Comparativo_Regional_2.png)
 
-![Peso dos Itens](ASSETS/docs/prototipos/Peso_dos_itens.png)
+![Peso dos Itens](Prototipos/Peso_dos_itens.png)
 
-![Influencia Eventos Externos](ASSETS/docs/prototipos/Influencia_Eventos_Externos.png)
+![Influencia Eventos Externos](Prototipos/Influencia_Eventos_Externos.png)
 
 
 ## 🗂️ Estrutura do Repositório
