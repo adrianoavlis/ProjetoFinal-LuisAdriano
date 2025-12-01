@@ -43,7 +43,7 @@ As análises, indicadores e visualizações foram fundamentados nos dados do DIE
 
 ![Evolução de Preços](Prototipos/Evolução.png)
 
-![Evolução de Preços](Prototipos/Grafico_Evolucao.png)
+![Evolução de Preços](Prototipos/Grafico_Evolução.png)
 
 ![Comparativo Regional](Prototipos/Comparativo_Regional.png)
 
