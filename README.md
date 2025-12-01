@@ -45,13 +45,13 @@ As análises, indicadores e visualizações foram fundamentados nos dados do DIE
 
 ![Evolução de Preços](Prototipos/Grafico_Evolucao.png)
 
-![Comparativo Regional](Prototipos/Comparativo_Regional_.png)
+![Comparativo Regional](Prototipos/Comparativo_Regional.png)
 
 ![Comparativo Regional](Prototipos/Comparativo_Regional_2.png)
 
 ![Peso dos Itens](Prototipos/Peso_dos_itens.png)
 
-![Influencia Eventos Externos](Prototipos/Influencia_Eventos_Externos.png)
+![Influencia Eventos Externos](Prototipos/Influência_Eventos_Externos.png)
 
 
 ## 🗂️ Estrutura do Repositório
