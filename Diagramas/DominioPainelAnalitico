@@ -1,0 +1,288 @@
+// =========================================================
+// Modelo de Domínio - Painel Cesta Básica
+// Astah UML 10.1.0 - ECMAScript idempotente
+// =========================================================
+
+run();
+
+function run() {
+    if (!isSupportedAstah()) {
+        print('This edition is not supported for this script.');
+        return;
+    }
+
+    with (new JavaImporter(
+        com.change_vision.jude.api.inf.model,
+        com.change_vision.jude.api.inf.editor
+    )) {
+
+        var Point2D = Java.type("java.awt.geom.Point2D$Double");
+
+        try {
+            TransactionManager.beginTransaction();
+
+            var root = astah.getProject(); // IModel
+
+            var modelEditorFactory   = astah.getModelEditorFactory();
+            var diagramEditorFactory = astah.getDiagramEditorFactory();
+
+            var basic       = modelEditorFactory.getBasicModelEditor();
+            var classEditor = diagramEditorFactory.getClassDiagramEditor();
+
+            // ---------- Helpers para reaproveitar se já existir ----------
+
+            function getOrCreatePackage(owner, name) {
+                var els = owner.getOwnedElements();
+                for (var i = 0; i < els.length; i++) {
+                    var e = els[i];
+                    if (e instanceof IPackage && e.getName() === name) {
+                        return e;
+                    }
+                }
+                return basic.createPackage(owner, name);
+            }
+
+            function getOrCreateClass(pkg, name) {
+                var els = pkg.getOwnedElements();
+                for (var i = 0; i < els.length; i++) {
+                    var e = els[i];
+                    if (e instanceof IClass && e.getName() === name) {
+                        return e;
+                    }
+                }
+                return basic.createClass(pkg, name);
+            }
+
+            function getOrCreateEnum(pkg, name) {
+                var els = pkg.getOwnedElements();
+                for (var i = 0; i < els.length; i++) {
+                    var e = els[i];
+                    if (e instanceof IEnumeration && e.getName() === name) {
+                        return e;
+                    }
+                }
+                return basic.createEnumeration(pkg, name);
+            }
+
+            function hasAttribute(clazz, attrName) {
+                var atts = clazz.getAttributes();
+                for (var i = 0; i < atts.length; i++) {
+                    if (atts[i].getName() === attrName) return true;
+                }
+                return false;
+            }
+
+            // 🔧 CORREÇÃO AQUI: usar getEnumerationLiterals()
+            function hasLiteral(enm, litName) {
+                var lits = enm.getEnumerationLiterals();
+                for (var i = 0; i < lits.length; i++) {
+                    if (lits[i].getName() === litName) return true;
+                }
+                return false;
+            }
+
+            function ensureGeneralization(sub, sup) {
+                var gens = sub.getGeneralizations();
+                for (var i = 0; i < gens.length; i++) {
+                    if (gens[i].getSuperType() === sup) return;
+                }
+                basic.createGeneralization(sub, sup);
+            }
+
+            function getOrCreateClassDiagram(ownerPkg, name) {
+                var diagrams = astah.getProject().getDiagrams();
+                for (var i = 0; i < diagrams.length; i++) {
+                    var d = diagrams[i];
+                    if (d.getName && d.getName() === name) {
+                        return d;
+                    }
+                }
+                return classEditor.createClassDiagram(ownerPkg, name);
+            }
+
+            // -----------------------------------------
+            // 1) Pacotes
+            // -----------------------------------------
+            var pkgBr    = getOrCreatePackage(root, "br");
+            var pkgCom   = getOrCreatePackage(pkgBr, "com");
+            var pkgShop2 = getOrCreatePackage(pkgCom, "shop2");
+            var pkgModel = getOrCreatePackage(pkgShop2, "model");
+
+            var pkgCommon    = getOrCreatePackage(pkgModel, "common");
+            var pkgDados     = getOrCreatePackage(pkgModel, "dados");
+            var pkgEvento    = getOrCreatePackage(pkgModel, "evento");
+            var pkgConverter = getOrCreatePackage(pkgModel, "converter");
+            var pkgMercado   = getOrCreatePackage(pkgModel, "mercado");
+
+            // -----------------------------------------
+            // 2) Classes principais
+            // -----------------------------------------
+            var BaseEntity = getOrCreateClass(pkgCommon, "BaseEntity");
+            BaseEntity.setAbstract(true);
+            if (!hasAttribute(BaseEntity, "id")) {
+                basic.createAttribute(BaseEntity, "id", "Long");
+            }
+            if (!hasAttribute(BaseEntity, "createdAt")) {
+                basic.createAttribute(BaseEntity, "createdAt", "LocalDateTime");
+            }
+            if (!hasAttribute(BaseEntity, "updatedAt")) {
+                basic.createAttribute(BaseEntity, "updatedAt", "LocalDateTime");
+            }
+
+            var GastoMensal = getOrCreateClass(pkgDados, "GastoMensal");
+            if (!hasAttribute(GastoMensal, "municipio")) {
+                basic.createAttribute(GastoMensal, "municipio", "Municipios");
+            }
+            if (!hasAttribute(GastoMensal, "mesAno")) {
+                basic.createAttribute(GastoMensal, "mesAno", "YearMonth");
+            }
+            if (!hasAttribute(GastoMensal, "valorTotal")) {
+                basic.createAttribute(GastoMensal, "valorTotal", "BigDecimal");
+            }
+            if (!hasAttribute(GastoMensal, "carne")) {
+                basic.createAttribute(GastoMensal, "carne", "BigDecimal");
+            }
+            if (!hasAttribute(GastoMensal, "leite")) {
+                basic.createAttribute(GastoMensal, "leite", "BigDecimal");
+            }
+            if (!hasAttribute(GastoMensal, "feijao")) {
+                basic.createAttribute(GastoMensal, "feijao", "BigDecimal");
+            }
+            if (!hasAttribute(GastoMensal, "arroz")) {
+                basic.createAttribute(GastoMensal, "arroz", "BigDecimal");
+            }
+            if (!hasAttribute(GastoMensal, "pao")) {
+                basic.createAttribute(GastoMensal, "pao", "BigDecimal");
+            }
+
+            var EventoExterno = getOrCreateClass(pkgEvento, "EventoExterno");
+            if (!hasAttribute(EventoExterno, "titulo")) {
+                basic.createAttribute(EventoExterno, "titulo", "String");
+            }
+            if (!hasAttribute(EventoExterno, "descricao")) {
+                basic.createAttribute(EventoExterno, "descricao", "String");
+            }
+            if (!hasAttribute(EventoExterno, "dataInicio")) {
+                basic.createAttribute(EventoExterno, "dataInicio", "LocalDate");
+            }
+            if (!hasAttribute(EventoExterno, "dataFim")) {
+                basic.createAttribute(EventoExterno, "dataFim", "LocalDate");
+            }
+            if (!hasAttribute(EventoExterno, "impacto")) {
+                basic.createAttribute(EventoExterno, "impacto", "Impacto");
+            }
+            if (!hasAttribute(EventoExterno, "municipiosAfetados")) {
+                basic.createAttribute(EventoExterno, "municipiosAfetados", "List<Municipios>");
+            }
+
+            var CestaBasica = getOrCreateClass(pkgMercado, "CestaBasica");
+            if (!hasAttribute(CestaBasica, "id")) {
+                basic.createAttribute(CestaBasica, "id", "Long");
+            }
+            if (!hasAttribute(CestaBasica, "municipio")) {
+                basic.createAttribute(CestaBasica, "municipio", "String");
+            }
+            if (!hasAttribute(CestaBasica, "mesAnoTexto")) {
+                basic.createAttribute(CestaBasica, "mesAnoTexto", "String");
+            }
+            if (!hasAttribute(CestaBasica, "valorTotal")) {
+                basic.createAttribute(CestaBasica, "valorTotal", "BigDecimal");
+            }
+            if (!hasAttribute(CestaBasica, "createdAt")) {
+                basic.createAttribute(CestaBasica, "createdAt", "LocalDateTime");
+            }
+            if (!hasAttribute(CestaBasica, "updatedAt")) {
+                basic.createAttribute(CestaBasica, "updatedAt", "LocalDateTime");
+            }
+
+            // -----------------------------------------
+            // 3) Enums
+            // -----------------------------------------
+            var Impacto = getOrCreateEnum(pkgEvento, "Impacto");
+            if (!hasLiteral(Impacto, "POSITIVO")) {
+                basic.createEnumerationLiteral(Impacto, "POSITIVO");
+            }
+            if (!hasLiteral(Impacto, "NEGATIVO")) {
+                basic.createEnumerationLiteral(Impacto, "NEGATIVO");
+            }
+
+            var Municipios = getOrCreateEnum(pkgCommon, "Municipios");
+            if (!hasLiteral(Municipios, "SAO_PAULO")) {
+                basic.createEnumerationLiteral(Municipios, "SAO_PAULO");
+            }
+            if (!hasLiteral(Municipios, "RIO_DE_JANEIRO")) {
+                basic.createEnumerationLiteral(Municipios, "RIO_DE_JANEIRO");
+            }
+
+            // -----------------------------------------
+            // 4) Converters, DTOs, Forms, Filtro
+            // -----------------------------------------
+            var YearMonthConv  = getOrCreateClass(pkgConverter, "YearMonthAttributeConverter");
+            var MunicipiosConv = getOrCreateClass(pkgConverter, "MunicipiosListaConverter");
+            var EventoForm     = getOrCreateClass(pkgEvento, "EventoExternoForm");
+            var EventoDTO      = getOrCreateClass(pkgEvento, "EventoExternoDetalheDTO");
+            var FiltroEvol     = getOrCreateClass(pkgCommon, "EvolucaoFiltro");
+
+            // -----------------------------------------
+            // 5) Generalizações
+            // -----------------------------------------
+            ensureGeneralization(GastoMensal, BaseEntity);
+            ensureGeneralization(EventoExterno, BaseEntity);
+
+            // -----------------------------------------
+            // 6) Diagrama de classes
+            // -----------------------------------------
+            var diagramName = "ModeloDominioPainel";
+            var diagram = getOrCreateClassDiagram(pkgModel, diagramName);
+
+            var x = 40.0, y = 40.0;
+            var dx = 260.0, dy = 180.0;
+            var maxX = 1100.0;
+
+            function addToDiagram(el) {
+                // Evita duplicar apresentações
+                var pres = diagram.getPresentations();
+                for (var i = 0; i < pres.length; i++) {
+                    if (pres[i].getModel() === el) {
+                        return;
+                    }
+                }
+                var p = new Point2D(x, y);
+                classEditor.createNodePresentation(el, p);
+                x += dx;
+                if (x > maxX) {
+                    x = 40.0;
+                    y += dy;
+                }
+            }
+
+            addToDiagram(BaseEntity);
+            addToDiagram(GastoMensal);
+            addToDiagram(EventoExterno);
+            addToDiagram(CestaBasica);
+            addToDiagram(Impacto);
+            addToDiagram(Municipios);
+            addToDiagram(YearMonthConv);
+            addToDiagram(MunicipiosConv);
+            addToDiagram(EventoForm);
+            addToDiagram(EventoDTO);
+            addToDiagram(FiltroEvol);
+
+            TransactionManager.endTransaction();
+            print("✅ Modelo de domínio criado/atualizado no diagrama '" + diagramName + "'.");
+
+            var dgmViewManager = astah.getViewManager().getDiagramViewManager();
+            dgmViewManager.open(diagram);
+
+        } catch (e) {
+            TransactionManager.abortTransaction();
+            print("❌ Erro ao criar/atualizar o modelo: " + e);
+        }
+    }
+}
+
+function isSupportedAstah() {
+    var edition = astah.getAstahEdition();
+    print('Your edition is ' + edition);
+    return (edition == 'professional' || edition == 'UML');
+}

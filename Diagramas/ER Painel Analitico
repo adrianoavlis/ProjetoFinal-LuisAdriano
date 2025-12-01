@@ -1,0 +1,107 @@
+/**
+ * Script ECMAScript para Astah UML 10.1
+ *
+ * Cria um diagrama de classes "Domínio - Cesta Básica"
+ * com o modelo conceitual do painel da Cesta Básica.
+ */
+
+run();
+
+function run() {
+
+    // Garante que há um projeto aberto
+    var project;
+    try {
+        project = astah.getProject();
+    } catch (e) {
+        print("❌ Nenhum projeto Astah está aberto.\n");
+        print("   Abra ou crie um .asta (File > New / Open) e rode novamente.\n");
+        return;
+    }
+
+    // Importa classes Java necessárias
+    var imports = new JavaImporter(
+        com.change_vision.jude.api.inf.editor,
+        com.change_vision.jude.api.inf.model,
+        java.awt.geom
+    );
+
+    with (imports) {
+
+        var tx = astah.getTransactionManager();
+
+        try {
+            tx.beginTransaction();
+
+            var modelEditorFactory   = astah.getModelEditorFactory();
+            var basicModelEditor     = modelEditorFactory.getBasicModelEditor();
+            var diagramEditorFactory = astah.getDiagramEditorFactory();
+            var classDiagramEditor   = diagramEditorFactory.getClassDiagramEditor();
+
+            var root = project;
+
+            // Cria o diagrama
+            var diagramName = "Domínio - Cesta Básica";
+            var classDiagram = classDiagramEditor.createClassDiagram(root, diagramName);
+            classDiagramEditor.setDiagram(classDiagram);
+
+            // ---- Helper: cria classe + apresentação e devolve ambos ----
+            function criarClasse(nome, x, y) {
+                var clazz = basicModelEditor.createClass(root, nome);
+                var ponto = new Point2D.Double(x, y);
+                var pres  = classDiagramEditor.createNodePresentation(clazz, ponto);
+                return {
+                    clazz: clazz,
+                    pres:  pres
+                };
+            }
+
+            // Cria classes do domínio
+            var pais          = criarClasse("Pais",          80,  40);
+            var estado        = criarClasse("Estado",        280, 40);
+            var municipio     = criarClasse("Municipio",     480, 40);
+            var cestaBasica   = criarClasse("CestaBasica",   180, 220);
+            var gastoMensal   = criarClasse("GastoMensal",   380, 220);
+            var eventoExterno = criarClasse("EventoExterno", 580, 220);
+
+            // ---- Helper: cria associação + linha no diagrama ----
+            // Assinatura usada:
+            // createAssociation(IClass left, IClass right, String assocName, String leftRole, String rightRole)
+            // createLinkPresentation(IElement, INodePresentation, INodePresentation)
+            function criarAssociacao(leftObj, rightObj, nomeAssoc, roleLeft, roleRight) {
+
+                var assoc = basicModelEditor.createAssociation(
+                    leftObj.clazz,
+                    rightObj.clazz,
+                    nomeAssoc || "",
+                    roleLeft  || "",
+                    roleRight || ""
+                );
+
+                classDiagramEditor.createLinkPresentation(
+                    assoc,
+                    leftObj.pres,
+                    rightObj.pres
+                );
+
+                return assoc;
+            }
+
+            // Relacionamentos do domínio
+            criarAssociacao(pais,        estado,        "possui",  "pais",      "estados");
+            criarAssociacao(estado,      municipio,     "abrange", "estado",    "municipios");
+            criarAssociacao(municipio,   cestaBasica,   "gera",    "municipio", "cestas");
+            criarAssociacao(municipio,   gastoMensal,   "agrega",  "municipio", "gastosMensais");
+            criarAssociacao(eventoExterno, cestaBasica, "impacta", "eventos",   "cestasAfetadas");
+            criarAssociacao(eventoExterno, gastoMensal, "impacta", "eventos",   "gastosAfetados");
+
+            tx.endTransaction();
+            print("✅ Diagrama '" + diagramName + "' criado com sucesso!\n");
+            print("   Ajuste multiplicidades manualmente nas associações, se desejar.\n");
+
+        } catch (e2) {
+            try { tx.abortTransaction(); } catch (ignore) {}
+            print("❌ Erro ao criar o diagrama: " + e2 + "\n");
+        }
+    }
+}

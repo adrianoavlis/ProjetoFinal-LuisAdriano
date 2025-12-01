@@ -1,0 +1,42 @@
+1. Evolução dos Preços
+Apresentar um gráfico que ilustre o valor da cesta básica conforme o(s) município(s) e períodos selecionados.
+A funcionalidade deverá:
+Calcular e exibir o preço médio da cesta básica por município e período, ou dos municípios e período;
+
+
+Identificar e exibir o menor preço da cesta no intervalo selecionado;
+
+
+Analisar e indicar a tendência (alta ou queda) do preço da cesta;
+
+
+Exibir um mapa interativo dos municípios, onde, ao posicionar o cursor sobre um ponto, o usuário visualize informações como: preço atual, menor e maior preço, item mais caro, item mais barato e tendência para o mês atual. 
+2. Comparação Regional
+Exibir um comparativo entre municípios e períodos selecionados.
+A funcionalidade deverá:
+Apresentar um gráfico comparativo adequado (ex.: barras ou radar);
+
+
+Exibir uma tabela resumo contendo o custo atual, menor e maior preço do período e a tendência observada para cada município.
+
+
+
+
+3. Peso dos Itens
+Identificar os produtos de maior representatividade no custo total da cesta e exibir sua participação percentual.
+A funcionalidade deverá:
+Exibir um gráfico de pizza representando o peso de cada item em relação ao valor médio da cesta;
+
+
+Exibir uma lista detalhada por município com o item mais caro, o mais barato, o que apresentou aumento e o que teve redução de preço.
+
+4. Influência de Eventos Externos
+Analisar o impacto de eventos externos sobre os valores da cesta básica e de seus itens.
+A funcionalidade deverá:
+Permitir o cadastro de eventos externos(CRUD), contendo nome, descrição, período, municípios afetados e um indicador de influência (positiva ou negativa);
+
+
+na pagina de administração dos dados(dados.jsp) Exibir uma lista de eventos cadastrados, com informações completas sobre cada ocorrência com botões para edição ou exclusão do evento;
+
+
+no grafico do index Relacionar os eventos aos municípios selecionados se tiverem relação, exibindo o periodo afetado no grafico e o tipo de impacto

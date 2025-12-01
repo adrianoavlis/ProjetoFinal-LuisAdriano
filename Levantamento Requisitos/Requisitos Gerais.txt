@@ -1,0 +1,49 @@
+✅ Requisitos Funcionais (RF)
+
+Funcionalidades que o sistema deve oferecer:
+
+RF01: O sistema deve coletar dados de preços da cesta básica em fontes oficiais (DIEESE).
+
+RF02: O sistema deve suportar scraping controlado e ético dos dados de inflação na web.
+
+RF03: O sistema deve armazenar os dados em um banco de dados estruturado (MSSQL Server).
+
+RF04: O sistema deve manter o histórico de preços da cesta por período.
+
+Processamento e Análise
+
+RF05: O sistema deve calcular indicadores como:
+
+preço médio, maior e menor preço por municipio e
+
+evolução histórica por preço/municipio.
+
+RF06: O sistema deve permitir comparações regionais (entre municipios).
+
+RF07: O sistema deve gerar relatórios analíticos (PDF/Excel) com gráficos fáceis de compreender.
+
+RF08: O sistema deve exibir dashboards com gráficos (linha, barra, dispersão, etc..) 
+
+RF09: O sistema deve oferecer filtros por período e municipio para as analises realizadas na tela.
+
+RF10: O sistema deve disponibilizar recursos modernos de vizualização interativa dos dados.
+
+⚙️ Requisitos Não Funcionais (RNF)
+
+RNF01: O sistema deve processar consultas informando o andamento de qualquer carregamento de dados na páginas da aplicação.
+
+RNF02: O scraping não deve sobrecarregar sites(respeitar rate limiting).
+
+RNF03: O sistema deve atender à LGPD, evitando coleta de dados pessoais.
+
+RNF04: Conexões devem ser feitas com HTTPS/TLS.
+
+RNF05: O sistema deve ter interface responsiva.
+
+RNF06: O design deve seguir boas práticas de acessibilidade (ex.: contraste, texto alternativo).
+
+RNF07: O sistema deve registrar logs de erros para auditoria.
+
+RNF08: O código deve ser documentado e versionado em GitHub/GitLab.
+
+RNF09: Deve suportar bancos de dados SQL compatíveis (MySQL, PostgreSQL).
