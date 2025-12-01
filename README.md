@@ -1,7 +1,7 @@
 # Plataforma de Análise da Cesta Básica
 
-Aplicação web desenvolvida como parte do Trabalho de Conclusão de Curso em Sistemas de Informação da Universidade Federal Fluminense (UFF), Instituto de Computação (IC).  
-A plataforma investiga o custo da cesta básica no Brasil, combinando dados oficiais e ferramentas analíticas para apoiar pesquisas acadêmicas e decisões em políticas públicas.
+Aplicação web desenvolvida como parte do Trabalho de Conclusão de Curso do Bacharelado em Sistemas de Informação da Universidade Federal Fluminense (UFF), Instituto de Computação (IC).
+A plataforma analisa o custo da cesta básica no Brasil, integrando dados oficiais e técnicas analíticas para apoiar pesquisas, monitoramento socioeconômico e decisões em políticas públicas.
 
 ## 🎯 Objetivo da Aplicação e Base Científica
 
@@ -12,22 +12,25 @@ A Plataforma de Análise da Cesta Básica oferece um painel interativo para:
 - Identificar **padrões de variação, sazonalidade e assimetrias regionais**.
 - Relacionar o custo da cesta com **inflação e eventos externos**.
 
-As visualizações e indicadores são fundamentados em dados do DIEESE, além de análises produzidas no contexto do artigo científico do TCC.
+As análises, indicadores e visualizações foram fundamentados nos dados do DIEESE, além dos resultados discutidos no artigo científico desenvolvido para o TCC.
 
 ## 📚 Eixos Analíticos da Pesquisa
 
 - **Evolução dos preços**
 - **Comparação regional**
-- **Impacto da inflação**
 - **Peso dos itens**
 - **Influência de eventos externos**
 
 ## 📊 Funcionalidades Principais
 
-1. **Evolução dos preços**
-2. **Comparação regional**
-3. **Peso dos itens**
-4. **Influência de eventos externos**
+1. 📈**Evolução dos preços**
+   – Tendência, variação mensal, preço médio, máximo e mínimo.
+3. 🌎**Comparação regional**
+   – Análises lado a lado entre municípios; gráficos e tabelas comparativas.
+5. 🥫**Peso dos itens**
+   – Participação percentual dos alimentos na composição total da cesta.
+7. ⚡**Influência de eventos externos**
+   – CRUD de eventos e correlação com oscilações de preços.
 
 ## 💻 Arquitetura e Tecnologias Utilizadas
 
@@ -36,6 +39,8 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 - **Banco de Dados:** Microsoft SQL Server  
 - **Versionamento:** Git e GitHub
 
+## 🧩 Diagrama da Arquitetura
+![Diagrama](Diagramas/Diagrama_de_arquitetura.pdf)
 
 ##  Painel Analítico da Cesta Básica
 
@@ -55,7 +60,7 @@ As visualizações e indicadores são fundamentados em dados do DIEESE, além de
 ## 🗂️ Estrutura do Repositório
 
 ```text
-ProjetoFinal-LuisAdriano/
+ProjetoFinal-LuisAdriano/app/Painel
 ├── pom.xml
 ├── src/
 │   ├── main/
@@ -72,7 +77,7 @@ ProjetoFinal-LuisAdriano/
 
 ```bash
 git clone https://github.com/adrianoavlis/ProjetoFinal-LuisAdriano.git
-cd ProjetoFinal-LuisAdriano
+cd ProjetoFinal-LuisAdriano/app/Painel
 ```
 
 2. **Configurar o banco de dados SQL Server**
