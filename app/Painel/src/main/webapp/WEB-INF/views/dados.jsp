@@ -339,8 +339,7 @@
                                             data-evento-url="<c:url value='/dados/eventos/${evento.id}/atualizar'/>">
                                       Editar
                                     </button>
-                                    <form action="<c:url value='/dados/eventos/${evento.id}/excluir'/>" method="post"
-                                          onsubmit="return confirm('Confirma a remoção deste evento?');">
+                                    <form action="<c:url value='/dados/eventos/${evento.id}/excluir'/>" method="post">
                                       <button type="submit" class="btn btn-outline-danger">Excluir</button>
                                     </form>
                                   </div>
