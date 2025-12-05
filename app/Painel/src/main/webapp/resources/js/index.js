@@ -1982,22 +1982,59 @@
     }
   }
 
+  function obterBotoesAvisoErroMapa() {
+    const containers = [
+      document.getElementById("mapaMunicipios"),
+      document.getElementById("mapMunicipios"),
+      ...Array.from(document.querySelectorAll(".gm-style"))
+    ].filter(Boolean);
+
+    const colecao = new Set();
+    const selectors = [
+      ".gm-err-container button",
+      ".gm-err-container a",
+      "button[data-map-error]",
+      "[aria-label*='map error' i]",
+      "[aria-label*='mapa error' i]",
+      "[aria-label*='mapa erro' i]"
+    ];
+
+    containers.forEach((container) => {
+      selectors.forEach((selector) => {
+        container.querySelectorAll(selector).forEach((el) => {
+          if (!el || typeof el.click !== "function") return;
+          const texto = (el.textContent || "").toLowerCase();
+          const temTextoAlvo = ["ok", "entendi", "error", "erro", "mapa"].some((palavra) => texto.includes(palavra));
+          if (el.offsetParent !== null || temTextoAlvo) {
+            colecao.add(el);
+          }
+        });
+      });
+    });
+
+    return Array.from(colecao);
+  }
+
   function agendarCliquesPosBusca() {
     if (postBuscaTimeoutId) {
       clearTimeout(postBuscaTimeoutId);
     }
 
-    const xpaths = [
-      "/html/body/main/section[3]/div[2]/div/div[2]/div[2]/table/tr/td[2]/button",
-      "/html/body/main/section[2]/div[2]/section/div[2]/div/div[2]/div[1]/div/div[2]/table/tr/td[2]/button"
-    ];
-
     postBuscaTimeoutId = window.setTimeout(() => {
       postBuscaTimeoutId = null;
-      xpaths.forEach((xpath) => {
-        const botao = obterElementoPorXPath(xpath);
-        if (botao && typeof botao.click === "function") {
-          botao.click();
+      const elementos = [
+        ...obterBotoesAvisoErroMapa(),
+        ...[
+          "/html/body/main/section[3]/div[2]/div/div[2]/div[2]/table/tr/td[2]/button",
+          "/html/body/main/section[2]/div[2]/section/div[2]/div/div[2]/div[1]/div/div[2]/table/tr/td[2]/button"
+        ].map(obterElementoPorXPath).filter(Boolean)
+      ];
+
+      elementos.forEach((el) => {
+        try {
+          el.click();
+        } catch (clickError) {
+          console.warn("Falha ao acionar elemento de aviso de erro do mapa", clickError);
         }
       });
     }, 1000);
